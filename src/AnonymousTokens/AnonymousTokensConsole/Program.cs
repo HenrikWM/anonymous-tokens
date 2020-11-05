@@ -11,7 +11,7 @@ namespace AnonymousTokensConsole
 
             // Generate private key k,
             // and public key K.
-            var generator = new ECKeyPairGenerator("EC");
+            var generator = new ECKeyPairGenerator("ECDSA");
             generator.Init(new KeyGenerationParameters(new SecureRandom(), strength));
             var keyPair = generator.GenerateKeyPair();
 
