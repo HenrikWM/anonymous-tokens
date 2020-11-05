@@ -40,13 +40,13 @@ namespace AnonymousTokensConsole
             // Verify that the token (t,W) is correct.
             // TODO            
 
-            var plainText = "Hello world";
+            var payload = "Hello world";
 
-            var signature = SignData(plainText, keyPair.Private);
+            var signature = GetSignature(payload, keyPair.Private);
 
             Console.WriteLine($"Signature: {signature}");
 
-            if (VerifySignature(keyPair.Public, signature, plainText))
+            if (VerifySignature(keyPair.Public, signature, payload))
             {
                 Console.WriteLine("Valid signature!");
             }
@@ -56,41 +56,41 @@ namespace AnonymousTokensConsole
             }
         }
 
-        private static string SignData(string msg, AsymmetricKeyParameter privKey)
+        private static string GetSignature(string payload, AsymmetricKeyParameter key)
         {
             try
             {
-                byte[] msgBytes = Encoding.UTF8.GetBytes(msg);
+                byte[] msgBytes = Encoding.UTF8.GetBytes(payload);
 
                 ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-                signer.Init(true, privKey);
+                signer.Init(true, key);
                 signer.BlockUpdate(msgBytes, 0, msgBytes.Length);
                 byte[] sigBytes = signer.GenerateSignature();
 
                 return Convert.ToBase64String(sigBytes);
             }
-            catch (Exception exc)
+            catch (Exception exception)
             {
-                Console.WriteLine("Signing Failed: " + exc.ToString());
+                Console.WriteLine("Signing failed: " + exception.ToString());
                 return null;
             }
         }
 
-        private static bool VerifySignature(AsymmetricKeyParameter pubKey, string signature, string msg)
+        private static bool VerifySignature(AsymmetricKeyParameter key, string signature, string payload)
         {
             try
             {
-                byte[] msgBytes = Encoding.UTF8.GetBytes(msg);
+                byte[] msgBytes = Encoding.UTF8.GetBytes(payload);
                 byte[] sigBytes = Convert.FromBase64String(signature);
 
                 ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-                signer.Init(false, pubKey);
+                signer.Init(false, key);
                 signer.BlockUpdate(msgBytes, 0, msgBytes.Length);
                 return signer.VerifySignature(sigBytes);
             }
-            catch (Exception exc)
+            catch (Exception exception)
             {
-                Console.WriteLine("Verification failed with the error: " + exc.ToString());
+                Console.WriteLine("Verification failed with the error: " + exception.ToString());
                 return false;
             }
         }
