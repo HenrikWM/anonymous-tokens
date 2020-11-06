@@ -1,19 +1,12 @@
-﻿using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Security;
-
-namespace AnonymousTokensConsole
+﻿namespace AnonymousTokensConsole
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var strength = 256;
-
             // Generate private key k,
             // and public key K.
-            var generator = new ECKeyPairGenerator("ECDSA");
-            generator.Init(new KeyGenerationParameters(new SecureRandom(), strength));
-            var keyPair = generator.GenerateKeyPair();
+            // TODO
 
             // Generate token Q = k*P, and create
             // proof (c,z) of correctness, given G and K.
