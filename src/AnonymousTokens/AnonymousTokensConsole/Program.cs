@@ -57,13 +57,13 @@ namespace AnonymousTokensConsole
             random.NextBytes(t);
             ECPoint T = HashToCurve(curve, t);
 
-            ECPoint P = curve.GetMultiplier().Multiply(T, r);
+            ECPoint P = T.Multiply(r);
 
             // Sanity check på dette tidspunktet, for å sjekke at det vi gjør gir mening. Skal ikke med i ferdig kode:
             ECFieldElement x = curve.FromBigInteger(r);
             ECFieldElement xi = x.Invert();
             var ri = xi.ToBigInteger();
-            Debug.Assert(curve.GetMultiplier().Multiply(P, ri) == T);
+            Debug.Assert(P.Multiply(ri) == T);
 
             return (t, r, P);
         }
@@ -75,7 +75,7 @@ namespace AnonymousTokensConsole
         /// <param name="k"></param>
         public static void GenerateToken(ECCurve curve, ECPoint P, BigInteger k)
         {
-            var Q = curve.GetMultiplier().Multiply(P, k);
+            var Q = P.Multiply(k);
             // TODO: Så må vi lage et ZK-bevis. Det tar vi når vi har fått resten her til å fungere
         }
 
