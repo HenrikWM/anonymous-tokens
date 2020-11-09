@@ -49,8 +49,19 @@ namespace AnonymousTokensConsole
             }
 
             var t = new byte[32];
-            random.NextBytes(t);
-            ECPoint T = HashToCurve(curve, t);
+            ECPoint T;
+            for (; ; )
+            {
+                random.NextBytes(t);
+                T = HashToCurve(curve, t);
+
+                if (T == null)
+                {
+                    continue;
+                }
+
+                break;
+            }
 
             ECPoint P = T.Multiply(r);
 
@@ -89,15 +100,14 @@ namespace AnonymousTokensConsole
 
             //var T = ECCurve.CreatePoint(x, y);
             //return T;
-            return curve.CreatePoint(new BigInteger(""), new BigInteger("")); // TODO: slett denne linjen, bare for å få ting til å kompilere
+            return null;
         }
 
         static void Main(string[] args)
         {
             var ecParameters = GetECParameters("secp256k1");
 
-            // Generate private key k,
-            // and public key K.
+            // Generate private key k and public key K.
             var keyPair = KeyGeneration.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
@@ -106,13 +116,19 @@ namespace AnonymousTokensConsole
             Console.WriteLine($"Private key: {ToHex(privateKey.D.ToByteArrayUnsigned())}");
             Console.WriteLine($"Public key: {ToHex(publicKey.Q.GetEncoded())}");
 
+            // Initiate communication
             var config = Initiate(ecParameters.Curve);
             var t = config.t;
+
+            Console.WriteLine($"t: {ToHex(t)}");
+
             var r = config.r;
+
+            Console.WriteLine($"r: {ToHex(t)}");
+
             var P = config.P;
 
-            // Generate token Q = k*P, and create
-            // proof (c,z) of correctness, given G and K.
+            // Generate token
             GenerateToken(P, privateKey.D);
 
             // Randomise the token Q, by removing
