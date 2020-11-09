@@ -68,7 +68,7 @@ namespace AnonymousTokensConsole
         /// </summary>
         /// <param name="P"></param>
         /// <param name="k"></param>
-        public static void GenerateToken(ECCurve curve, ECPoint P, BigInteger k)
+        public static void GenerateToken(ECPoint P, BigInteger k)
         {
             var Q = P.Multiply(k);
             // TODO: Så må vi lage et ZK-bevis. Det tar vi når vi har fått resten her til å fungere
@@ -113,7 +113,7 @@ namespace AnonymousTokensConsole
 
             // Generate token Q = k*P, and create
             // proof (c,z) of correctness, given G and K.
-            GenerateToken(ecParameters.Curve, P, privateKey.D);
+            GenerateToken(P, privateKey.D);
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
