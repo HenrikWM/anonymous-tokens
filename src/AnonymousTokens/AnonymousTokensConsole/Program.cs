@@ -36,7 +36,7 @@ namespace AnonymousTokensConsole
             var random = new SecureRandom();
 
             // From GenerateKeyPair() of ECKeyPairGenerator            
-            BigInteger r = curve.Field.Characteristic; //< random mellom 0 og curve.Fi.getCharacteristic >
+            BigInteger r = curve.Field.Characteristic;
             BigInteger d;
             int minWeight = r.BitLength >> 2;
 
@@ -68,11 +68,16 @@ namespace AnonymousTokensConsole
             return (t, r, P);
         }
 
-        //// Kjøres på verifikasjonsserveren
-        //public static void GenerateToken(ECPoint P, BigInteger k) {
-        //    //Q = ECMultiply(P, k)
-        //    // Så må vi lage et ZK-bevis. Det tar vi når vi har fått resten her til å fungere
-        //}
+        /// <summary>
+        /// Kjøres på verifikasjonsserveren
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="k"></param>
+        public static void GenerateToken(ECCurve curve, ECPoint P, BigInteger k)
+        {
+            var Q = curve.GetMultiplier().Multiply(P, k);
+            // TODO: Så må vi lage et ZK-bevis. Det tar vi når vi har fått resten her til å fungere
+        }
 
         public static ECPoint HashToCurve(ECCurve curve, byte[] t)
         {
@@ -106,14 +111,14 @@ namespace AnonymousTokensConsole
             Console.WriteLine($"Private key: {ToHex(privateKey.D.ToByteArrayUnsigned())}");
             Console.WriteLine($"Public key: {ToHex(publicKey.Q.GetEncoded())}");
 
-            // Generate token Q = k*P, and create
-            // proof (c,z) of correctness, given G and K.
             var config = Initiate(ecParameters.Curve);
             var t = config.t;
             var r = config.r;
             var P = config.P;
 
-            //GenerateToken()
+            // Generate token Q = k*P, and create
+            // proof (c,z) of correctness, given G and K.
+            GenerateToken(ecParameters.Curve, P, privateKey.D);
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
