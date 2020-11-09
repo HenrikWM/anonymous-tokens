@@ -1,11 +1,17 @@
 ﻿using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Math.EC.Multiplier;
 using Org.BouncyCastle.Security;
 
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
+
+using ECCurve = Org.BouncyCastle.Math.EC.ECCurve;
+using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
 namespace AnonymousTokensConsole
 {
@@ -23,24 +29,67 @@ namespace AnonymousTokensConsole
             return ECNamedCurveTable.GetByName(algorithm);
         }
 
-        /// <summary>
-        /// Generate private key k,
-        /// and public key K.
-        /// </summary>
-        /// <param name="ecParameters">The Elliptic Curve X9ECParameters-parameters with the curve, points etc.</param>
-        /// <returns>The key pair with private and public key</returns>
-        private static AsymmetricCipherKeyPair KeyGeneration(X9ECParameters ecParameters)
+        // Appen, kjøres i forbindelse med innlogging til idporten
+        // t og r lagres på dingsen, P sendes til idporten
+        public static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
-            var generator = new ECKeyPairGenerator("EC");
-
-            var domainParams = new ECDomainParameters(ecParameters.Curve, ecParameters.G, ecParameters.N, ecParameters.H, ecParameters.GetSeed());
             var random = new SecureRandom();
 
-            var keyGenerationParameters = new ECKeyGenerationParameters(domainParams, random);
+            // From GenerateKeyPair() of ECKeyPairGenerator            
+            BigInteger r = curve.Field.Characteristic; //< random mellom 0 og curve.Fi.getCharacteristic >
+            BigInteger d;
+            int minWeight = r.BitLength >> 2;
 
-            generator.Init(keyGenerationParameters);
+            for (; ; )
+            {
+                d = new BigInteger(r.BitLength, random);
 
-            return generator.GenerateKeyPair();
+                if (d.CompareTo(BigInteger.One) < 0 || d.CompareTo(r) >= 0)
+                    continue;
+
+                if (WNafUtilities.GetNafWeight(d) < minWeight)
+                    continue;
+
+                break;
+            }
+
+            var t = new byte[32];
+            random.NextBytes(t);
+            ECPoint T = HashToCurve(curve, t);
+
+            ECPoint P = curve.GetMultiplier().Multiply(T, r);
+
+            // Sanity check på dette tidspunktet, for å sjekke at det vi gjør gir mening. Skal ikke med i ferdig kode:
+            ECFieldElement x = curve.FromBigInteger(r);
+            ECFieldElement xi = x.Invert();
+            var ri = xi.ToBigInteger();
+            Debug.Assert(curve.GetMultiplier().Multiply(P, ri) == T);
+
+            return (t, r, P);
+        }
+
+        //// Kjøres på verifikasjonsserveren
+        //public static void GenerateToken(ECPoint P, BigInteger k) {
+        //    //Q = ECMultiply(P, k)
+        //    // Så må vi lage et ZK-bevis. Det tar vi når vi har fått resten her til å fungere
+        //}
+
+        public static ECPoint HashToCurve(ECCurve curve, byte[] t)
+        {
+            var sha256 = SHA256.Create();
+            var hash = sha256.ComputeHash(t);
+
+            // x = tolk hash som et FieldElement, i range 0 < x < ECCurve.FiniteField.order
+            // Dette er i prinisppet enkelt, siden ECCurve.FiniteField.order for kurven P-256 er et 256 bit tall. 
+            // Imidlertid, dersom x > ECCurve.FiniteField.order hadde det vært fristende å bare kjøre en mod-operasjon for å få x liten nok. 
+            // Det vil gjøre at lave x blir litt mer sannsynlige enn høye x, og derfor et sikkerhetsproblem. Da er det bedre å returnere med feil, og be om ny tilfeldig t. OK, la oss anta at alt er i orden hittil.
+
+            // y2 = x ^ 3 + ECCurve.a * x + ECCurve.b // Alt dette skal være FieldElement, så forhåpentligvis gjør den modulo automatisk
+            // y = y2.sqrt() // Denne har 50 % sjanse for å lykkes. Hvis den ikke gjør det, be om ny tilfeldig t.
+
+            //var T = ECCurve.CreatePoint(x, y);
+            //return T;
+            return curve.CreatePoint(new BigInteger(""), new BigInteger("")); // TODO: slett denne linjen, bare for å få ting til å kompilere
         }
 
         static void Main(string[] args)
@@ -49,7 +98,7 @@ namespace AnonymousTokensConsole
 
             // Generate private key k,
             // and public key K.
-            var keyPair = KeyGeneration(ecParameters);
+            var keyPair = KeyGeneration.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
@@ -59,7 +108,12 @@ namespace AnonymousTokensConsole
 
             // Generate token Q = k*P, and create
             // proof (c,z) of correctness, given G and K.
-            // TODO
+            var config = Initiate(ecParameters.Curve);
+            var t = config.t;
+            var r = config.r;
+            var P = config.P;
+
+            //GenerateToken()
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
