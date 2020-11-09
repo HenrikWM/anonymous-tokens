@@ -1,11 +1,9 @@
 ﻿using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -65,12 +63,6 @@ namespace AnonymousTokensConsole
 
             ECPoint P = T.Multiply(r);
 
-            // Sanity check på dette tidspunktet, for å sjekke at det vi gjør gir mening. Skal ikke med i ferdig kode:
-            ECFieldElement x = curve.FromBigInteger(r);
-            ECFieldElement xi = x.Invert();
-            var ri = xi.ToBigInteger();
-            Debug.Assert(P.Multiply(ri) == T);
-
             return (t, r, P);
         }
 
@@ -113,8 +105,16 @@ namespace AnonymousTokensConsole
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
-            Console.WriteLine($"Private key: {ToHex(privateKey.D.ToByteArrayUnsigned())}");
-            Console.WriteLine($"Public key: {ToHex(publicKey.Q.GetEncoded())}");
+            Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
+            Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
+
+            // Sanity check
+            var testPoint = ecParameters.G.Multiply(privateKey.D);
+            Console.WriteLine($"\nManually:\n{ToHex(testPoint.GetEncoded())}");
+            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
+            var baseAgain = testPoint.Multiply(inverseKey);
+            Console.WriteLine($"\nBase point:\n{ToHex(ecParameters.G.GetEncoded())}");
+            Console.WriteLine($"\nHopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
 
             // Initiate communication
             var config = Initiate(ecParameters.Curve);
@@ -124,7 +124,7 @@ namespace AnonymousTokensConsole
 
             var r = config.r;
 
-            Console.WriteLine($"r: {ToHex(t)}");
+            Console.WriteLine($"r: {ToHex(r.ToByteArrayUnsigned())}");
 
             var P = config.P;
 
