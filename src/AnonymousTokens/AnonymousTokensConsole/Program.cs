@@ -2,7 +2,6 @@
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
-using Org.BouncyCastle.Math.EC.Multiplier;
 using Org.BouncyCastle.Security;
 
 using System;
@@ -38,16 +37,12 @@ namespace AnonymousTokensConsole
             // From GenerateKeyPair() of ECKeyPairGenerator            
             BigInteger r = curve.Field.Characteristic;
             BigInteger d;
-            int minWeight = r.BitLength >> 2;
 
             for (; ; )
             {
                 d = new BigInteger(r.BitLength, random);
 
                 if (d.CompareTo(BigInteger.One) < 0 || d.CompareTo(r) >= 0)
-                    continue;
-
-                if (WNafUtilities.GetNafWeight(d) < minWeight)
                     continue;
 
                 break;
