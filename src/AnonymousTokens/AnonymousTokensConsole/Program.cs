@@ -5,6 +5,7 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -67,10 +68,11 @@ namespace AnonymousTokensConsole
         /// </summary>
         /// <param name="P"></param>
         /// <param name="k"></param>
-        public static void GenerateToken(ECPoint P, BigInteger k)
+        public static ECPoint GenerateToken(ECPoint P, BigInteger k)
         {
             var Q = P.Multiply(k);
-            // TODO: Så må vi lage et ZK-bevis. Det tar vi når vi har fått resten her til å fungere
+
+            return Q;
         }
 
         public static ECPoint HashToCurve(ECCurve curve, byte[] t)
@@ -112,13 +114,7 @@ namespace AnonymousTokensConsole
             Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
             Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
 
-            // Sanity check
-            var testPoint = ecParameters.G.Multiply(privateKey.D);
-            Console.WriteLine($"\nManually:\n{ToHex(testPoint.GetEncoded())}");
-            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
-            var baseAgain = testPoint.Multiply(inverseKey);
-            Console.WriteLine($"\nBase point:\n{ToHex(ecParameters.G.GetEncoded())}");
-            Console.WriteLine($"\nHopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
+            SanityCheck(ecParameters, privateKey);
 
             // Initiate communication
             var config = Initiate(ecParameters.Curve);
