@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 
 using ECCurve = Org.BouncyCastle.Math.EC.ECCurve;
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
@@ -129,8 +130,12 @@ namespace AnonymousTokensConsole
             var commitment1Encoded = commitment1.GetEncoded();
             var commitment2Encoded = commitment2.GetEncoded();
 
+            var domain = "smittestopptoken";
+            var domainEncoded = Encoding.ASCII.GetBytes(domain);
+
             // using concat() best for performance: https://stackoverflow.com/a/415396
-            IEnumerable<byte> points = basePoint1Encoded
+            IEnumerable<byte> points = domainEncoded
+                .Concat(basePoint1Encoded)
                 .Concat(basePoint2Encoded)
                 .Concat(newPoint1Encoded)
                 .Concat(newPoint2Encoded)
