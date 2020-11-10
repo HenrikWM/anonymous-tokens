@@ -1,11 +1,16 @@
 ﻿using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
+
+using ECCurve = Org.BouncyCastle.Math.EC.ECCurve;
+using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
 namespace AnonymousTokensConsole
 {
@@ -23,43 +28,123 @@ namespace AnonymousTokensConsole
             return ECNamedCurveTable.GetByName(algorithm);
         }
 
-        /// <summary>
-        /// Generate private key k,
-        /// and public key K.
-        /// </summary>
-        /// <param name="ecParameters">The Elliptic Curve X9ECParameters-parameters with the curve, points etc.</param>
-        /// <returns>The key pair with private and public key</returns>
-        private static AsymmetricCipherKeyPair KeyGeneration(X9ECParameters ecParameters)
+        private static void SanityCheck(X9ECParameters ecParameters, ECPrivateKeyParameters privateKey)
         {
-            var generator = new ECKeyPairGenerator("EC");
+            var testPoint = ecParameters.G.Multiply(privateKey.D);
 
-            var domainParams = new ECDomainParameters(ecParameters.Curve, ecParameters.G, ecParameters.N, ecParameters.H, ecParameters.GetSeed());
+            Console.WriteLine($"\nSanity-check - manually:\n{ToHex(testPoint.GetEncoded())}");
+
+            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
+            var baseAgain = testPoint.Multiply(inverseKey);
+
+            Debug.Assert(ecParameters.G.GetEncoded() == baseAgain.GetEncoded());
+
+            Console.WriteLine($"\nSanity-check - base point:\n{ToHex(ecParameters.G.GetEncoded())}");
+            Console.WriteLine($"\nSanity-check - hopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
+        }
+
+        // Appen, kjøres i forbindelse med innlogging til idporten
+        // t og r lagres på dingsen, P sendes til idporten        
+        public static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
+        {
             var random = new SecureRandom();
+            BigInteger N = curve.Order;
+            BigInteger r;
 
-            var keyGenerationParameters = new ECKeyGenerationParameters(domainParams, random);
+            // Sample random 0 < r < N
+            for (; ; )
+            {
+                r = new BigInteger(N.BitLength, random);
+                if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(N) >= 0)
+                    continue;
+                break;
+            }
 
-            generator.Init(keyGenerationParameters);
+            // Sample random bytes t such that x = hash(t) is a valid
+            // x-coordinate on the curve. Then T = HashToCurve(t).
+            var t = new byte[32];
+            ECPoint T;
+            for (; ; )
+            {
+                random.NextBytes(t);
+                T = HashToCurve(curve, t);
+                if (T == null)
+                    continue;
+                break;
+            }
 
-            return generator.GenerateKeyPair();
+            // Compute P = r*T
+            ECPoint P = T.Multiply(r);
+            return (t, r, P);
+        }
+
+        /// <summary>
+        /// Kjøres på verifikasjonsserveren
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="k"></param>
+        private static ECPoint GenerateToken(ECPoint P, BigInteger k)
+        {
+            var Q = P.Multiply(k);
+
+            return Q;
+        }
+
+        private static ECPoint HashToCurve(ECCurve curve, byte[] t)
+        {
+            ECFieldElement temp, x, ax, x3, y, y2;
+
+            var P = curve.Field.Characteristic;
+            var sha256 = SHA256.Create();
+            var hash = new BigInteger(sha256.ComputeHash(t));
+
+            if (hash.CompareTo(BigInteger.One) < 0 || hash.CompareTo(P) >= 0)
+                return null;
+
+            x = curve.FromBigInteger(hash);     // x
+            ax = x.Multiply(curve.A);           // Ax
+            temp = x.Multiply(x);               // x^2
+            x3 = temp.Multiply(x);              // x^3
+            temp = x3.Add(ax);                  // x^3 + Ax
+            y2 = temp.Add(curve.B);             // y^2 = x^3 + Ax + B
+            y = y2.Sqrt();                      // y = sqrt(x^3 + Ax + B)
+
+            if (y == null)
+                return null;
+
+            ECPoint T = curve.CreatePoint(x.ToBigInteger(), y.ToBigInteger());
+            return T;
         }
 
         static void Main(string[] args)
         {
             var ecParameters = GetECParameters("secp256k1");
 
-            // Generate private key k,
-            // and public key K.
-            var keyPair = KeyGeneration(ecParameters);
+            // Generate private key k and public key K.
+            var keyPair = KeyGeneration.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
-            Console.WriteLine($"Private key: {ToHex(privateKey.D.ToByteArrayUnsigned())}");
-            Console.WriteLine($"Public key: {ToHex(publicKey.Q.GetEncoded())}");
+            Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
+            Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
 
-            // Generate token Q = k*P, and create
-            // proof (c,z) of correctness, given G and K.
-            // TODO
+            SanityCheck(ecParameters, privateKey);
+
+            // Initiate communication
+            var config = Initiate(ecParameters.Curve);
+            var t = config.t;
+
+            Console.WriteLine($"t: {ToHex(t)}");
+
+            var r = config.r;
+
+            Console.WriteLine($"r: {ToHex(r.ToByteArrayUnsigned())}");
+
+            var P = config.P;
+
+            // Generate token
+            GenerateToken(P, privateKey.D);
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
@@ -69,6 +154,5 @@ namespace AnonymousTokensConsole
             // Verify that the token (t,W) is correct.
             // TODO            
         }
-
     }
 }
