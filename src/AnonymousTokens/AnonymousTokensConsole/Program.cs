@@ -5,9 +5,11 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 
 using ECCurve = Org.BouncyCastle.Math.EC.ECCurve;
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
@@ -28,37 +30,13 @@ namespace AnonymousTokensConsole
             return ECNamedCurveTable.GetByName(algorithm);
         }
 
-        private static void SanityCheck(X9ECParameters ecParameters, ECPrivateKeyParameters privateKey)
-        {
-            var testPoint = ecParameters.G.Multiply(privateKey.D);
-
-            Console.WriteLine($"\nSanity-check - manually:\n{ToHex(testPoint.GetEncoded())}");
-
-            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
-            var baseAgain = testPoint.Multiply(inverseKey);
-
-            Debug.Assert(ecParameters.G.GetEncoded() == baseAgain.GetEncoded());
-
-            Console.WriteLine($"\nSanity-check - base point:\n{ToHex(ecParameters.G.GetEncoded())}");
-            Console.WriteLine($"\nSanity-check - hopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
-        }
-
         // Appen, kjøres i forbindelse med innlogging til idporten
         // t og r lagres på dingsen, P sendes til idporten        
-        public static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
+        private static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
             var random = new SecureRandom();
-            BigInteger N = curve.Order;
-            BigInteger r;
 
-            // Sample random 0 < r < N
-            for (; ; )
-            {
-                r = new BigInteger(N.BitLength, random);
-                if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(N) >= 0)
-                    continue;
-                break;
-            }
+            BigInteger r = RandomCurveNumberGenerator.GenerateRandomNumber(curve, random);
 
             // Sample random bytes t such that x = hash(t) is a valid
             // x-coordinate on the curve. Then T = HashToCurve(t).
@@ -83,11 +61,13 @@ namespace AnonymousTokensConsole
         /// </summary>
         /// <param name="P"></param>
         /// <param name="k"></param>
-        private static ECPoint GenerateToken(ECPoint P, BigInteger k)
+        private static (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
         {
             var Q = P.Multiply(k);
 
-            return Q;
+            var proof = CreateProof(ecParameters, k, K, P, Q);
+
+            return (Q, proof.c, proof.z);
         }
 
         private static ECPoint HashToCurve(ECCurve curve, byte[] t)
@@ -116,20 +96,104 @@ namespace AnonymousTokensConsole
             return T;
         }
 
+        private static ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
+        {
+            // Verify the proof (c,z).
+            if (VerifyProof(ecParameters, K, P, Q, c, z))
+            {
+                Console.WriteLine("Proof is valid.");
+            }
+            else
+            {
+                Console.WriteLine("Proof is not valid.");
+                Debug.Fail("Token is invalid.");
+            }
+
+            var rInverse = r.ModInverse(ecParameters.Curve.Order);
+            var W = Q.Multiply(rInverse);
+            return W;
+        }
+
+        private static bool VerifyToken(ECCurve curve, byte[] t, ECPoint W, BigInteger k)
+        {
+            var T = HashToCurve(curve, t);
+            var V = T.Multiply(k);
+            return V.Equals(W);
+        }
+
+        private static BigInteger CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
+        {
+            var basePoint1Encoded = basePoint1.GetEncoded();
+            var basePoint2Encoded = basePoint2.GetEncoded();
+            var newPoint1Encoded = newPoint1.GetEncoded();
+            var newPoint2Encoded = newPoint2.GetEncoded();
+            var commitment1Encoded = commitment1.GetEncoded();
+            var commitment2Encoded = commitment2.GetEncoded();
+
+            var domain = "smittestopptoken";
+            var domainEncoded = Encoding.ASCII.GetBytes(domain);
+
+            // using concat() best for performance: https://stackoverflow.com/a/415396
+            IEnumerable<byte> points = domainEncoded
+                .Concat(basePoint1Encoded)
+                .Concat(basePoint2Encoded)
+                .Concat(newPoint1Encoded)
+                .Concat(newPoint2Encoded)
+                .Concat(commitment1Encoded)
+                .Concat(commitment2Encoded);
+
+            var sha256 = SHA256.Create();
+            var hash = new BigInteger(sha256.ComputeHash(points.ToArray()));
+
+            return hash.Mod(basePoint1.Curve.Order);
+        }
+
+        private static (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, BigInteger k, ECPoint K, ECPoint P, ECPoint Q)
+        {
+            var random = new SecureRandom();
+
+            BigInteger r = RandomCurveNumberGenerator.GenerateRandomNumber(ecParameters.Curve, random);
+
+            ECPoint X = ecParameters.G.Multiply(r);
+            ECPoint Y = P.Multiply(r);
+
+            BigInteger c = CreateChallenge(ecParameters.G, P, K, Q, X, Y);
+
+            // Compute z = r - ck mod N
+            BigInteger z = r.Subtract(c.Multiply(k)).Mod(ecParameters.Curve.Order);
+
+            return (c, z);
+        }
+
+        private static bool VerifyProof(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
+        {
+            ECPoint temp, temp2, Y, X;
+
+            // Compute zP+cQ = rP = Y
+            temp = P.Multiply(z);
+            temp2 = Q.Multiply(c);
+            Y = temp.Add(temp2);
+
+            // Compute zG+cK = rG = X
+            temp = ecParameters.G.Multiply(z);
+            temp2 = K.Multiply(c);
+            X = temp.Add(temp2);
+
+            return c.Equals(CreateChallenge(ecParameters.G, P, K, Q, X, Y));
+        }
+
         static void Main(string[] args)
         {
             var ecParameters = GetECParameters("secp256k1");
 
             // Generate private key k and public key K.
-            var keyPair = KeyGeneration.CreateKeyPair(ecParameters);
+            var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
             Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
             Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
-
-            SanityCheck(ecParameters, privateKey);
 
             // Initiate communication
             var config = Initiate(ecParameters.Curve);
@@ -144,15 +208,26 @@ namespace AnonymousTokensConsole
             var P = config.P;
 
             // Generate token
-            GenerateToken(P, privateKey.D);
+            var token = GenerateToken(ecParameters, P, publicKey.Q, privateKey.D);
+            var Q = token.Q;
+            var c = token.c;
+            var z = token.z;
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
             // Also checks that proof (c,z) is correct.
-            // TODO
+            var W = RandomiseToken(ecParameters, publicKey.Q, P, Q, c, z, r);
 
             // Verify that the token (t,W) is correct.
-            // TODO            
+            if (VerifyToken(ecParameters.Curve, t, W, privateKey.D))
+            {
+                Console.WriteLine("Token is valid.");
+            }
+            else
+            {
+                Console.WriteLine("Token is invalid.");
+                Debug.Fail("Token is invalid.");
+            }
         }
     }
 }

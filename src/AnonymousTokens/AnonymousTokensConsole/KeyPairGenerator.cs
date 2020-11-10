@@ -6,7 +6,7 @@ using Org.BouncyCastle.Security;
 
 namespace AnonymousTokensConsole
 {
-    public static class KeyGeneration
+    public static class KeyPairGenerator
     {
         /// <summary>
         /// Generate private key k,
