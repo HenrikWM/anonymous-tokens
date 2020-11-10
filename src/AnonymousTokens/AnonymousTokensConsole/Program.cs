@@ -110,9 +110,19 @@ namespace AnonymousTokensConsole
             return T;
         }
 
-        private static ECPoint RandomiseToken(ECCurve curve, ECPoint Q, BigInteger r)
+        private static ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
-            var rInv = r.ModInverse(curve.Order);
+            // Verify the proof (c,z).
+            if (VerifyProof(ecParameters, P, Q, K, c, z))
+            {
+                Console.WriteLine("Proof is valid.");
+            }
+            else
+            {
+                Console.WriteLine("Proof is not valid.");
+            }
+
+            var rInv = r.ModInverse(ecParameters.Curve.Order);
             var W = Q.Multiply(rInv);
             return W;
         }
@@ -150,12 +160,22 @@ namespace AnonymousTokensConsole
             return (c, z);
         }
 
-        //VerifyProof(ecParameters, ECPoint publicKey, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
+        private static bool VerifyProof(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
+        {
+            ECPoint temp, temp2, Y, X;
 
-        //    ECPoint X = ecParameters.G.Multiply(z).Add(publicKey.Multiply(c));
-        //        ECPoint Y = P.Multiply(z).Add(Q.Multiply(c));
-        //        cPrime = CreateChallenge(ecParameters.G, P, publicKey, Q, X, Y);
-        //	return c == cPrime // Hvis de to er like, så er vi fornøyd. Hvis de er like når de *skal* være like, så kan vi virkelig være godt fornøyde.
+            // Compute zP+cQ = rP = A
+            temp = P.Multiply(z);
+            temp2 = Q.Multiply(c);
+            Y = temp.Add(temp2);
+
+            // Compute zG+cK = rG = B
+            temp = ecParameters.G.Multiply(z);
+            temp2 = K.Multiply(c);
+            X = temp.Add(temp2);
+
+            return c == CreateChallenge(ecParameters.G, P, Q, K, Y, X);
+        }
 
         static void Main(string[] args)
         {
@@ -184,13 +204,14 @@ namespace AnonymousTokensConsole
 
             // Generate token
             var token = GenerateToken(ecParameters, P, publicKey.Q, privateKey.D);
+            var Q = token.Q;
             var c = token.c;
             var z = token.z;
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
             // Also checks that proof (c,z) is correct.
-            var W = RandomiseToken(ecParameters.Curve, token.Q, r);
+            var W = RandomiseToken(ecParameters, publicKey.Q, P, Q, c, z, r);
 
             // Verify that the token (t,W) is correct.
             if (VerifyToken(ecParameters.Curve, t, W, privateKey.D))
