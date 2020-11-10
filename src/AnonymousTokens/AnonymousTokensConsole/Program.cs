@@ -72,8 +72,10 @@ namespace AnonymousTokensConsole
         /// <returns>A signed point and a Chaum-Pedersen proof verifying that the point is signed correctly</returns>
         private static (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
         {
+            // Compute Q = k*P
             var Q = P.Multiply(k);
 
+            // Chaum-Pedersen proof of correct signature
             var proof = CreateProof(ecParameters, k, K, P, Q);
 
             return (Q, proof.c, proof.z);
@@ -96,6 +98,7 @@ namespace AnonymousTokensConsole
             if (hash.CompareTo(BigInteger.One) < 0 || hash.CompareTo(P) >= 0)
                 return null;
 
+            // A valid point (x,y) satisfies y^2 = x^3 + Ax + B mod P
             x = curve.FromBigInteger(hash);     // x
             ax = x.Multiply(curve.A);           // Ax
             temp = x.Multiply(x);               // x^2
@@ -104,6 +107,7 @@ namespace AnonymousTokensConsole
             y2 = temp.Add(curve.B);             // y^2 = x^3 + Ax + B
             y = y2.Sqrt();                      // y = sqrt(x^3 + Ax + B)
 
+            // y == null if square root does not exist mod P
             if (y == null)
                 return null;
 
@@ -135,6 +139,7 @@ namespace AnonymousTokensConsole
                 Debug.Fail("Token is invalid.");
             }
 
+            // Removing the initial mask r. W = (1/r)*Q = k*P.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
             var W = Q.Multiply(rInverse);
             return W;
@@ -156,14 +161,15 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Creates the challenge for the Chaum-Pedersen protocol, using the strong Fiat-Shamir transformation. Hashes all input and a fixed domain to create an unpredictable number. Used by both the app and the authorities.
+        /// Creates the challenge for the Chaum-Pedersen protocol, using the strong Fiat-Shamir transformation.
+		/// Hashes all input and a fixed domain to create an unpredictable number. Used by both the app and the authorities.
         /// </summary>
         /// <param name="basePoint1">Left hand side base point</param>
         /// <param name="basePoint2">Right hand side base point</param>
         /// <param name="newPoint1">Left hand side basepoint-to-secret-exponent</param>
         /// <param name="newPoint2">Right hand side basepoint-to-secret-exponent</param>
-        /// <param name="commitment1">Left hand side commitment</param>
-        /// <param name="commitment2">Right hand side commitment</param>
+        /// <param name="commitment1">Left hand side commitment-to-random-exponent</param>
+        /// <param name="commitment2">Right hand side commitment-to-random-exponent</param>
         /// <returns>A random number based on all input</returns>
         private static BigInteger CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
         {
@@ -177,7 +183,7 @@ namespace AnonymousTokensConsole
             var domain = "smittestopptoken";
             var domainEncoded = Encoding.ASCII.GetBytes(domain);
 
-            // using concat() best for performance: https://stackoverflow.com/a/415396
+            // Using concat() is best for performance: https://stackoverflow.com/a/415396
             IEnumerable<byte> points = domainEncoded
                 .Concat(basePoint1Encoded)
                 .Concat(basePoint2Encoded)
@@ -205,14 +211,18 @@ namespace AnonymousTokensConsole
         {
             var random = new SecureRandom();
 
+            // Sample a random integer 0 < r < N
             BigInteger r = RandomCurveNumberGenerator.GenerateRandomNumber(ecParameters.Curve, random);
 
+            // Computes X = r*G
             ECPoint X = ecParameters.G.Multiply(r);
+
+            // Computes Y = r*P
             ECPoint Y = P.Multiply(r);
 
             BigInteger c = CreateChallenge(ecParameters.G, P, K, Q, X, Y);
 
-            // Compute z = r - ck mod N
+            // Compute proof z = r - ck mod N
             BigInteger z = r.Subtract(c.Multiply(k)).Mod(ecParameters.Curve.Order);
 
             return (c, z);
@@ -232,16 +242,17 @@ namespace AnonymousTokensConsole
         {
             ECPoint temp, temp2, Y, X;
 
-            // Compute zP+cQ = rP = Y
-            temp = P.Multiply(z);
-            temp2 = Q.Multiply(c);
-            Y = temp.Add(temp2);
-
-            // Compute zG+cK = rG = X
+            // Compute z*G + c*K = r*G = X
             temp = ecParameters.G.Multiply(z);
             temp2 = K.Multiply(c);
             X = temp.Add(temp2);
 
+            // Compute z*P + c*Q = r*P = Y
+            temp = P.Multiply(z);
+            temp2 = Q.Multiply(c);
+            Y = temp.Add(temp2);
+
+            // Returns true if the challenge from the proof equals the new challenge
             return c.Equals(CreateChallenge(ecParameters.G, P, K, Q, X, Y));
         }
 
@@ -249,7 +260,7 @@ namespace AnonymousTokensConsole
         {
             var ecParameters = GetECParameters("secp256k1");
 
-            // Generate private key k and public key K.
+            // Generate private key k and public key K = k*G
             var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
@@ -258,26 +269,22 @@ namespace AnonymousTokensConsole
             Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
             Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
 
-            // Initiate communication
+            // Initiate communication with a masked point P = r*T = r*Hash(t)
             var config = Initiate(ecParameters.Curve);
             var t = config.t;
 
             Console.WriteLine($"t: {ToHex(t)}");
 
             var r = config.r;
-
-            Console.WriteLine($"r: {ToHex(r.ToByteArrayUnsigned())}");
-
             var P = config.P;
 
-            // Generate token
+            // Generate token Q = k*P and proof (c,z) of correctness
             var token = GenerateToken(ecParameters, P, publicKey.Q, privateKey.D);
             var Q = token.Q;
             var c = token.c;
             var z = token.z;
 
-            // Randomise the token Q, by removing
-            // the mask r: W = (1/r)*Q = k*P.
+            // Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*P.
             // Also checks that proof (c,z) is correct.
             var W = RandomiseToken(ecParameters, publicKey.Q, P, Q, c, z, r);
 
