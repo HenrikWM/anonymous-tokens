@@ -33,9 +33,6 @@ namespace AnonymousTokensConsole
             return ECNamedCurveTable.GetByName(algorithm);
         }
 
-        // Appen, kjøres i forbindelse med innlogging til idporten
-        // t og r lagres på dingsen, P sendes til idporten   
-
         /// <summary>
         /// Runs on the app. Generates an initial point to be submitted to the authorities for signing.
         /// </summary>
