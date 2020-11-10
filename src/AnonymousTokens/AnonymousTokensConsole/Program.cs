@@ -29,20 +29,11 @@ namespace AnonymousTokensConsole
 
         // Appen, kjøres i forbindelse med innlogging til idporten
         // t og r lagres på dingsen, P sendes til idporten        
-        public static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
+        private static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
             var random = new SecureRandom();
-            BigInteger N = curve.Order;
-            BigInteger r;
 
-            // Sample random 0 < r < N
-            for (; ; )
-            {
-                r = new BigInteger(N.BitLength, random);
-                if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(N) >= 0)
-                    continue;
-                break;
-            }
+            BigInteger r = GetRandomNumber(curve, random);
 
             // Sample random bytes t such that x = hash(t) is a valid
             // x-coordinate on the curve. Then T = HashToCurve(t).
@@ -62,16 +53,35 @@ namespace AnonymousTokensConsole
             return (t, r, P);
         }
 
+        private static BigInteger GetRandomNumber(ECCurve curve, SecureRandom random)
+        {
+            BigInteger N = curve.Order;
+            BigInteger r;
+
+            // Sample random 0 < r < N
+            for (; ; )
+            {
+                r = new BigInteger(N.BitLength, random);
+                if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(N) >= 0)
+                    continue;
+                break;
+            }
+
+            return r;
+        }
+
         /// <summary>
         /// Kjøres på verifikasjonsserveren
         /// </summary>
         /// <param name="P"></param>
         /// <param name="k"></param>
-        private static ECPoint GenerateToken(ECPoint P, BigInteger k)
+        private static (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
         {
             var Q = P.Multiply(k);
 
-            return Q;
+            var proof = CreateProof(ecParameters, k, K, P, Q);
+
+            return (Q, proof.c, proof.z);
         }
 
         private static ECPoint HashToCurve(ECCurve curve, byte[] t)
@@ -114,24 +124,28 @@ namespace AnonymousTokensConsole
             return V.Equals(W);
         }
 
-        private void CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
+        private static BigInteger CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
         {
             // for hvert Point i argumentlista:
             // dytt Point.getEncoded() inn i SHA256(evnt.lang bytearray).I stedet for getEncoded kan man kanskje også bruke getAffineXCoord() og getAffineYCoord() sammen.Poenget er bare at man må binde seg til noe helt unikt ved punktet.
             //beregn hashen av hele greia
             //return output fra hele SHA256 som en BigInteger, .Mod(basePoint1.Curve.Order)
-
+            return null; // TODO: implementer
         }
 
-        //CreateProof(ecParameters, BigInteger privateKey, ECPoint publicKey, ECPoint P, ECPoint Q)
-        // var r = < tilfeldig tall på samme måte som vi valgte r for brukeren.den rutinen kan antageligvis samles på ett sted>
+        private static (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, BigInteger k, ECPoint K, ECPoint P, ECPoint Q)
+        {
+            var random = new SecureRandom();
 
-        // var X = ecParameters.G.Multiply(r);
-        //        var Y = P.Multiply(r);
-        //        BigInteger c = CreateChallenge(ecParameters.G, P, publicKey, Q, X, Y);
+            BigInteger r = GetRandomNumber(ecParameters.Curve, random);
+            ECPoint X = ecParameters.G.Multiply(r);
+            ECPoint Y = P.Multiply(r);
 
-        //        BigInteger z = r.Subtract(c.Multiply(privateKey.D)).Mod(ecParamters.Curve.Order); // Troooor denne kan funke for å beregne z = r - c*privateKey
-        //	return (c, z)
+            BigInteger c = CreateChallenge(ecParameters.G, P, K, Q, X, Y);
+            BigInteger z = r.Subtract(c.Multiply(k)).Mod(ecParameters.Curve.Order);
+
+            return (c, z);
+        }
 
         //VerifyProof(ecParameters, ECPoint publicKey, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
 
@@ -166,12 +180,14 @@ namespace AnonymousTokensConsole
             var P = config.P;
 
             // Generate token
-            var Q = GenerateToken(P, privateKey.D);
+            var token = GenerateToken(ecParameters, P, publicKey.Q, privateKey.D);
+            var c = token.c;
+            var z = token.z;
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
             // Also checks that proof (c,z) is correct.
-            var W = RandomiseToken(ecParameters.Curve, Q, r);
+            var W = RandomiseToken(ecParameters.Curve, token.Q, r);
 
             // Verify that the token (t,W) is correct.
             if (VerifyToken(ecParameters.Curve, t, W, privateKey.D))
