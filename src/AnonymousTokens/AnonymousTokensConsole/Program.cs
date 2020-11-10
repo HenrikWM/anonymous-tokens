@@ -164,17 +164,17 @@ namespace AnonymousTokensConsole
         {
             ECPoint temp, temp2, Y, X;
 
-            // Compute zP+cQ = rP = A
+            // Compute zP+cQ = rP = Y
             temp = P.Multiply(z);
             temp2 = Q.Multiply(c);
             Y = temp.Add(temp2);
 
-            // Compute zG+cK = rG = B
+            // Compute zG+cK = rG = X
             temp = ecParameters.G.Multiply(z);
             temp2 = K.Multiply(c);
             X = temp.Add(temp2);
 
-            return c == CreateChallenge(ecParameters.G, P, Q, K, Y, X);
+            return c == CreateChallenge(ecParameters.G, P, K, Q, X, Y);
         }
 
         static void Main(string[] args)
