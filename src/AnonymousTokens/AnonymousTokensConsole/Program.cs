@@ -21,10 +21,13 @@ namespace AnonymousTokensConsole
         static string ToHex(byte[] data) => string.Concat(data.Select(x => x.ToString("x2")));
 
         /// <summary>
-        /// Setup, kjøres på alle steder
-        /// 
-        /// P-256 ser ut til å ha en fin implementasjon, mens curve25519 visstnok er experimental. Hvis ikke hadde curve25519 vært førstevalget
-        /// </summary>
+		/// Defines an elliptic curve to be used in our protocol. We will use "secp256k1".
+		/// </summary>
+		/// <param name="algorithm"></param>
+		/// <returns>
+		/// Parameters including curve constants, base point, order and underlying field.
+		/// Built-in functions allows us to compute scalar multiplications and point additions.
+		/// </returns>
         private static X9ECParameters GetECParameters(string algorithm)
         {
             return ECNamedCurveTable.GetByName(algorithm);
