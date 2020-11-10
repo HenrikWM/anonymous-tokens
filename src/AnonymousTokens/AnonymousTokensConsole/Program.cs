@@ -174,7 +174,7 @@ namespace AnonymousTokensConsole
             temp2 = K.Multiply(c);
             X = temp.Add(temp2);
 
-            return c == CreateChallenge(ecParameters.G, P, K, Q, X, Y);
+            return c.Equals(CreateChallenge(ecParameters.G, P, K, Q, X, Y));
         }
 
         static void Main(string[] args)
