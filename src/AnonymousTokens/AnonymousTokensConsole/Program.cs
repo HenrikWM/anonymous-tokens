@@ -113,7 +113,7 @@ namespace AnonymousTokensConsole
         private static ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             // Verify the proof (c,z).
-            if (VerifyProof(ecParameters, P, Q, K, c, z))
+            if (VerifyProof(ecParameters, K, P, Q, c, z))
             {
                 Console.WriteLine("Proof is valid.");
             }
