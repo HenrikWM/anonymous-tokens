@@ -79,20 +79,28 @@ namespace AnonymousTokensConsole
 
         public static ECPoint HashToCurve(ECCurve curve, byte[] t)
         {
+            ECFieldElement temp, x, ax, x3, y, y2;
+
+            var P = curve.Field.Characteristic;
             var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(t);
+            var hash = new BigInteger(sha256.ComputeHash(t));
 
-            // x = tolk hash som et FieldElement, i range 0 < x < ECCurve.FiniteField.order
-            // Dette er i prinisppet enkelt, siden ECCurve.FiniteField.order for kurven P-256 er et 256 bit tall. 
-            // Imidlertid, dersom x > ECCurve.FiniteField.order hadde det vært fristende å bare kjøre en mod-operasjon for å få x liten nok. 
-            // Det vil gjøre at lave x blir litt mer sannsynlige enn høye x, og derfor et sikkerhetsproblem. Da er det bedre å returnere med feil, og be om ny tilfeldig t. OK, la oss anta at alt er i orden hittil.
+            if (hash.CompareTo(BigInteger.One) < 0 || hash.CompareTo(P) >= 0)
+                return null;
 
-            // y2 = x ^ 3 + ECCurve.a * x + ECCurve.b // Alt dette skal være FieldElement, så forhåpentligvis gjør den modulo automatisk
-            // y = y2.sqrt() // Denne har 50 % sjanse for å lykkes. Hvis den ikke gjør det, be om ny tilfeldig t.
+            x = curve.FromBigInteger(hash);     // x
+            ax = x.Multiply(curve.A);           // Ax
+            temp = x.Multiply(x);               // x^2
+            x3 = temp.Multiply(x);              // x^3
+            temp = x3.Add(ax);                  // x^3 + Ax
+            y2 = temp.Add(curve.B);             // y^2 = x^3 + Ax + B
+            y = y2.Sqrt();                      // y = sqrt(x^3 + Ax + B)
 
-            //var T = ECCurve.CreatePoint(x, y);
-            //return T;
-            return null;
+            if (y == null)
+                return null;
+
+            ECPoint T = curve.CreatePoint(x.ToBigInteger(), y.ToBigInteger());
+            return T;
         }
 
         static void Main(string[] args)
