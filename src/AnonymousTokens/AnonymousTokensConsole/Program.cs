@@ -28,6 +28,21 @@ namespace AnonymousTokensConsole
             return ECNamedCurveTable.GetByName(algorithm);
         }
 
+        private static void SanityCheck(X9ECParameters ecParameters, ECPrivateKeyParameters privateKey)
+        {
+            var testPoint = ecParameters.G.Multiply(privateKey.D);
+
+            Console.WriteLine($"\nSanity-check - manually:\n{ToHex(testPoint.GetEncoded())}");
+
+            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
+            var baseAgain = testPoint.Multiply(inverseKey);
+
+            Debug.Assert(ecParameters.G.GetEncoded() == baseAgain.GetEncoded());
+
+            Console.WriteLine($"\nSanity-check - base point:\n{ToHex(ecParameters.G.GetEncoded())}");
+            Console.WriteLine($"\nSanity-check - hopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
+        }
+
         // Appen, kjøres i forbindelse med innlogging til idporten
         // t og r lagres på dingsen, P sendes til idporten        
         public static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
@@ -68,14 +83,14 @@ namespace AnonymousTokensConsole
         /// </summary>
         /// <param name="P"></param>
         /// <param name="k"></param>
-        public static ECPoint GenerateToken(ECPoint P, BigInteger k)
+        private static ECPoint GenerateToken(ECPoint P, BigInteger k)
         {
             var Q = P.Multiply(k);
 
             return Q;
         }
 
-        public static ECPoint HashToCurve(ECCurve curve, byte[] t)
+        private static ECPoint HashToCurve(ECCurve curve, byte[] t)
         {
             ECFieldElement temp, x, ax, x3, y, y2;
 
