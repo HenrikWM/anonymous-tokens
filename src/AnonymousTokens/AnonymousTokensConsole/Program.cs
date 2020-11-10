@@ -5,6 +5,7 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -136,11 +137,25 @@ namespace AnonymousTokensConsole
 
         private static BigInteger CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
         {
-            // for hvert Point i argumentlista:
-            // dytt Point.getEncoded() inn i SHA256(evnt.lang bytearray).I stedet for getEncoded kan man kanskje også bruke getAffineXCoord() og getAffineYCoord() sammen.Poenget er bare at man må binde seg til noe helt unikt ved punktet.
-            //beregn hashen av hele greia
-            //return output fra hele SHA256 som en BigInteger, .Mod(basePoint1.Curve.Order)
-            return null; // TODO: implementer
+            var basePoint1Encoded = basePoint1.GetEncoded();
+            var basePoint2Encoded = basePoint2.GetEncoded();
+            var newPoint1Encoded = newPoint1.GetEncoded();
+            var newPoint2Encoded = newPoint2.GetEncoded();
+            var commitment1Encoded = commitment1.GetEncoded();
+            var commitment2Encoded = commitment2.GetEncoded();
+
+            // using concat() best for performance: https://stackoverflow.com/a/415396
+            IEnumerable<byte> points = basePoint1Encoded
+                .Concat(basePoint2Encoded)
+                .Concat(newPoint1Encoded)
+                .Concat(newPoint2Encoded)
+                .Concat(commitment1Encoded)
+                .Concat(commitment2Encoded);
+
+            var sha256 = SHA256.Create();
+            var hash = new BigInteger(sha256.ComputeHash(points.ToArray()));
+
+            return hash.Mod(basePoint1.Curve.Order);
         }
 
         private static (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, BigInteger k, ECPoint K, ECPoint P, ECPoint Q)
