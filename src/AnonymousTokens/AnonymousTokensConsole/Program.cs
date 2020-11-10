@@ -123,6 +123,13 @@ namespace AnonymousTokensConsole
             return W;
         }
 
+        private static bool VerifyToken(ECCurve curve, byte[] t, ECPoint W, BigInteger k)
+        {
+            var T = HashToCurve(curve, t);
+            var V = T.Multiply(k);
+            return V.Equals(W);
+        }
+
         private void CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
         {
             // for hvert Point i argumentlista:
@@ -184,9 +191,15 @@ namespace AnonymousTokensConsole
             // Also checks that proof (c,z) is correct.
             var W = RandomiseToken(ecParameters.Curve, Q, r);
 
-
             // Verify that the token (t,W) is correct.
-
+            if (VerifyToken(ecParameters.Curve, t, W, privateKey.D))
+            {
+                Console.WriteLine("Token is valid.");
+            }
+            else
+            {
+                Console.WriteLine("Token is invalid.");
+            }
         }
     }
 }
