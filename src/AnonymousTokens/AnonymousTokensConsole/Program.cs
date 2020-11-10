@@ -116,6 +116,39 @@ namespace AnonymousTokensConsole
             return T;
         }
 
+        private static ECPoint RandomiseToken(ECCurve curve, ECPoint Q, BigInteger r)
+        {
+            var rInv = r.ModInverse(curve.Order);
+            var W = Q.Multiply(rInv);
+            return W;
+        }
+
+        private void CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
+        {
+            // for hvert Point i argumentlista:
+            // dytt Point.getEncoded() inn i SHA256(evnt.lang bytearray).I stedet for getEncoded kan man kanskje også bruke getAffineXCoord() og getAffineYCoord() sammen.Poenget er bare at man må binde seg til noe helt unikt ved punktet.
+            //beregn hashen av hele greia
+            //return output fra hele SHA256 som en BigInteger, .Mod(basePoint1.Curve.Order)
+
+        }
+
+        //CreateProof(ecParameters, BigInteger privateKey, ECPoint publicKey, ECPoint P, ECPoint Q)
+        // var r = < tilfeldig tall på samme måte som vi valgte r for brukeren.den rutinen kan antageligvis samles på ett sted>
+
+        // var X = ecParameters.G.Multiply(r);
+        //        var Y = P.Multiply(r);
+        //        BigInteger c = CreateChallenge(ecParameters.G, P, publicKey, Q, X, Y);
+
+        //        BigInteger z = r.Subtract(c.Multiply(privateKey.D)).Mod(ecParamters.Curve.Order); // Troooor denne kan funke for å beregne z = r - c*privateKey
+        //	return (c, z)
+
+        //VerifyProof(ecParameters, ECPoint publicKey, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
+
+        //    ECPoint X = ecParameters.G.Multiply(z).Add(publicKey.Multiply(c));
+        //        ECPoint Y = P.Multiply(z).Add(Q.Multiply(c));
+        //        cPrime = CreateChallenge(ecParameters.G, P, publicKey, Q, X, Y);
+        //	return c == cPrime // Hvis de to er like, så er vi fornøyd. Hvis de er like når de *skal* være like, så kan vi virkelig være godt fornøyde.
+
         static void Main(string[] args)
         {
             var ecParameters = GetECParameters("secp256k1");
@@ -144,15 +177,16 @@ namespace AnonymousTokensConsole
             var P = config.P;
 
             // Generate token
-            GenerateToken(P, privateKey.D);
+            var Q = GenerateToken(P, privateKey.D);
 
             // Randomise the token Q, by removing
             // the mask r: W = (1/r)*Q = k*P.
             // Also checks that proof (c,z) is correct.
-            // TODO
+            var W = RandomiseToken(ecParameters.Curve, Q, r);
+
 
             // Verify that the token (t,W) is correct.
-            // TODO            
+
         }
     }
 }
