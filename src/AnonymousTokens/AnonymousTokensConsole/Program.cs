@@ -35,7 +35,7 @@ namespace AnonymousTokensConsole
         {
             var random = new SecureRandom();
 
-            BigInteger r = GetRandomNumber(curve, random);
+            BigInteger r = RandomCurveNumberGenerator.GenerateRandomNumber(curve, random);
 
             // Sample random bytes t such that x = hash(t) is a valid
             // x-coordinate on the curve. Then T = HashToCurve(t).
@@ -53,23 +53,6 @@ namespace AnonymousTokensConsole
             // Compute P = r*T
             ECPoint P = T.Multiply(r);
             return (t, r, P);
-        }
-
-        private static BigInteger GetRandomNumber(ECCurve curve, SecureRandom random)
-        {
-            BigInteger N = curve.Order;
-            BigInteger r;
-
-            // Sample random 0 < r < N
-            for (; ; )
-            {
-                r = new BigInteger(N.BitLength, random);
-                if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(N) >= 0)
-                    continue;
-                break;
-            }
-
-            return r;
         }
 
         /// <summary>
@@ -164,7 +147,7 @@ namespace AnonymousTokensConsole
         {
             var random = new SecureRandom();
 
-            BigInteger r = GetRandomNumber(ecParameters.Curve, random);
+            BigInteger r = RandomCurveNumberGenerator.GenerateRandomNumber(ecParameters.Curve, random);
 
             ECPoint X = ecParameters.G.Multiply(r);
             ECPoint Y = P.Multiply(r);
@@ -199,7 +182,7 @@ namespace AnonymousTokensConsole
             var ecParameters = GetECParameters("secp256k1");
 
             // Generate private key k and public key K.
-            var keyPair = KeyGeneration.CreateKeyPair(ecParameters);
+            var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
