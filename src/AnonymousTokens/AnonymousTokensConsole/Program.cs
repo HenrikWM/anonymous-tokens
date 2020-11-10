@@ -123,8 +123,8 @@ namespace AnonymousTokensConsole
                 Console.WriteLine("Proof is not valid.");
             }
 
-            var rInv = r.ModInverse(ecParameters.Curve.Order);
-            var W = Q.Multiply(rInv);
+            var rInverse = r.ModInverse(ecParameters.Curve.Order);
+            var W = Q.Multiply(rInverse);
             return W;
         }
 
