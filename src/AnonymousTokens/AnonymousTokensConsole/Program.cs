@@ -1,6 +1,7 @@
 ﻿using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
@@ -27,42 +28,37 @@ namespace AnonymousTokensConsole
         }
 
         // Appen, kjøres i forbindelse med innlogging til idporten
-        // t og r lagres på dingsen, P sendes til idporten
+        // t og r lagres på dingsen, P sendes til idporten        
         public static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
             var random = new SecureRandom();
+            BigInteger N = curve.Order;
+            BigInteger r;
 
-            // From GenerateKeyPair() of ECKeyPairGenerator            
-            BigInteger r = curve.Field.Characteristic;
-            BigInteger d;
-
+            // Sample random 0 < r < N
             for (; ; )
             {
-                d = new BigInteger(r.BitLength, random);
-
-                if (d.CompareTo(BigInteger.One) < 0 || d.CompareTo(r) >= 0)
+                r = new BigInteger(N.BitLength, random);
+                if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(N) >= 0)
                     continue;
-
                 break;
             }
 
+            // Sample random bytes t such that x = hash(t) is a valid
+            // x-coordinate on the curve. Then T = HashToCurve(t).
             var t = new byte[32];
             ECPoint T;
             for (; ; )
             {
                 random.NextBytes(t);
                 T = HashToCurve(curve, t);
-
                 if (T == null)
-                {
                     continue;
-                }
-
                 break;
             }
 
+            // Compute P = r*T
             ECPoint P = T.Multiply(r);
-
             return (t, r, P);
         }
 
