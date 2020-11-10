@@ -5,7 +5,6 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -26,21 +25,6 @@ namespace AnonymousTokensConsole
         private static X9ECParameters GetECParameters(string algorithm)
         {
             return ECNamedCurveTable.GetByName(algorithm);
-        }
-
-        private static void SanityCheck(X9ECParameters ecParameters, ECPrivateKeyParameters privateKey)
-        {
-            var testPoint = ecParameters.G.Multiply(privateKey.D);
-
-            Console.WriteLine($"\nSanity-check - manually:\n{ToHex(testPoint.GetEncoded())}");
-
-            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
-            var baseAgain = testPoint.Multiply(inverseKey);
-
-            Debug.Assert(ecParameters.G.GetEncoded() == baseAgain.GetEncoded());
-
-            Console.WriteLine($"\nSanity-check - base point:\n{ToHex(ecParameters.G.GetEncoded())}");
-            Console.WriteLine($"\nSanity-check - hopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
         }
 
         // Appen, kjøres i forbindelse med innlogging til idporten
@@ -168,8 +152,6 @@ namespace AnonymousTokensConsole
 
             Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
             Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
-
-            SanityCheck(ecParameters, privateKey);
 
             // Initiate communication
             var config = Initiate(ecParameters.Curve);
