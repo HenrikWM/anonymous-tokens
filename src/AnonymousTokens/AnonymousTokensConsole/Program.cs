@@ -138,10 +138,13 @@ namespace AnonymousTokensConsole
             var random = new SecureRandom();
 
             BigInteger r = GetRandomNumber(ecParameters.Curve, random);
+
             ECPoint X = ecParameters.G.Multiply(r);
             ECPoint Y = P.Multiply(r);
 
             BigInteger c = CreateChallenge(ecParameters.G, P, K, Q, X, Y);
+
+            // Compute z = r - ck mod N
             BigInteger z = r.Subtract(c.Multiply(k)).Mod(ecParameters.Curve.Order);
 
             return (c, z);
