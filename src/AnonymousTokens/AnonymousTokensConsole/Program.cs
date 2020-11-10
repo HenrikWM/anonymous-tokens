@@ -144,5 +144,19 @@ namespace AnonymousTokensConsole
             // TODO            
         }
 
+        private static void SanityCheck(X9ECParameters ecParameters, ECPrivateKeyParameters privateKey)
+        {
+            var testPoint = ecParameters.G.Multiply(privateKey.D);
+
+            Console.WriteLine($"\nManually:\n{ToHex(testPoint.GetEncoded())}");
+
+            var inverseKey = privateKey.D.ModInverse(ecParameters.Curve.Order);
+            var baseAgain = testPoint.Multiply(inverseKey);
+
+            Debug.Assert(ecParameters.G.GetEncoded() == baseAgain.GetEncoded());
+
+            Console.WriteLine($"\nBase point:\n{ToHex(ecParameters.G.GetEncoded())}");
+            Console.WriteLine($"\nHopefully base point:\n{ToHex(baseAgain.GetEncoded())}");
+        }
     }
 }
