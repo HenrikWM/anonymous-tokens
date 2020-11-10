@@ -6,6 +6,7 @@ using Org.BouncyCastle.Security;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -121,6 +122,7 @@ namespace AnonymousTokensConsole
             else
             {
                 Console.WriteLine("Proof is not valid.");
+                Debug.Fail("Token is invalid.");
             }
 
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
@@ -236,6 +238,7 @@ namespace AnonymousTokensConsole
             else
             {
                 Console.WriteLine("Token is invalid.");
+                Debug.Fail("Token is invalid.");
             }
         }
     }
