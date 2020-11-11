@@ -21,13 +21,13 @@ namespace AnonymousTokensConsole
         static string ToHex(byte[] data) => string.Concat(data.Select(x => x.ToString("x2")));
 
         /// <summary>
-		/// Defines an elliptic curve to be used in our protocol. We will use "secp256k1".
-		/// </summary>
-		/// <param name="algorithm"></param>
-		/// <returns>
-		/// Parameters including curve constants, base point, order and underlying field.
-		/// Built-in functions allows us to compute scalar multiplications and point additions.
-		/// </returns>
+	/// Defines an elliptic curve to be used in our protocol. We will use "secp256k1".
+	/// </summary>
+	/// <param name="algorithm"></param>
+	/// <returns>
+	/// Parameters including curve constants, base point, order and underlying field.
+	/// Built-in functions allows us to compute scalar multiplications and point additions.
+	/// </returns>
         private static X9ECParameters GetECParameters(string algorithm)
         {
             return ECNamedCurveTable.GetByName(algorithm);
@@ -162,7 +162,7 @@ namespace AnonymousTokensConsole
 
         /// <summary>
         /// Creates the challenge for the Chaum-Pedersen protocol, using the strong Fiat-Shamir transformation.
-		/// Hashes all input and a fixed domain to create an unpredictable number. Used by both the app and the authorities.
+	/// Hashes all input and a fixed domain to create an unpredictable number. Used by both the app and the authorities.
         /// </summary>
         /// <param name="basePoint1">Left hand side base point</param>
         /// <param name="basePoint2">Right hand side base point</param>
