@@ -123,7 +123,7 @@ namespace AnonymousTokensConsole
         /// <param name="P">Masked point initially submitted to the token service</param>
         /// <param name="Q">Signed masked point returned from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
-        /// <param name="z">Response from the Chaim-Pedersen proof</param>
+        /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <param name="r">Masking of the initial point</param>
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
         private static ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
@@ -237,7 +237,7 @@ namespace AnonymousTokensConsole
         /// <param name="P">Point initially submitted by the initiator</param>
         /// <param name="Q">Point received from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
-        /// <param name="z">Response from the Chaim-Pedersen proof</param>
+        /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <returns></returns>
         private static bool VerifyProof(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
         {
