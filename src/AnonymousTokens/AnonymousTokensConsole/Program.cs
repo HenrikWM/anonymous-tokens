@@ -98,7 +98,7 @@ namespace AnonymousTokensConsole
             if (hash.CompareTo(BigInteger.One) < 0 || hash.CompareTo(P) >= 0)
                 return null;
 
-            // A valid point (x,y) satisfies y^2 = x^3 + Ax + B mod P
+            // A valid point (x,y) must satisfy: y^2 = x^3 + Ax + B mod P
             x = curve.FromBigInteger(hash);     // x
             ax = x.Multiply(curve.A);           // Ax
             temp = x.Multiply(x);               // x^2
@@ -107,7 +107,7 @@ namespace AnonymousTokensConsole
             y2 = temp.Add(curve.B);             // y^2 = x^3 + Ax + B
             y = y2.Sqrt();                      // y = sqrt(x^3 + Ax + B)
 
-            // y == null if square root does not exist mod P
+            // y == null if square root mod P does not exist
             if (y == null)
                 return null;
 
@@ -180,6 +180,7 @@ namespace AnonymousTokensConsole
             var commitment1Encoded = commitment1.GetEncoded();
             var commitment2Encoded = commitment2.GetEncoded();
 
+            // Domain separation: make sure hash is independent of other systems
             var domain = "smittestopptoken";
             var domainEncoded = Encoding.ASCII.GetBytes(domain);
 

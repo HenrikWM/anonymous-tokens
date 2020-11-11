@@ -6,6 +6,12 @@ namespace AnonymousTokensConsole
 {
     public class RandomCurveNumberGenerator
     {
+        /// <summary>
+        /// Generate a random number r such that 0 < r < curve.Order
+        /// </summary>
+        /// <param name="curve">Curve parameters</param>
+        /// <param name="random">Random number generator</param>
+        /// <returns>Random number r</returns>
         public static BigInteger GenerateRandomNumber(ECCurve curve, SecureRandom random)
         {
             BigInteger N = curve.Order;
