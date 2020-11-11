@@ -26,7 +26,7 @@ namespace AnonymousTokensConsole
 	/// <param name="algorithm"></param>
 	/// <returns>
 	/// Parameters including curve constants, base point, order and underlying field.
-	/// Built-in functions allows us to compute scalar multiplications and point additions.
+	/// Built-in functions allow us to compute scalar multiplications and point additions.
 	/// </returns>
         private static X9ECParameters GetECParameters(string algorithm)
         {
@@ -34,10 +34,10 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Runs on the app. Generates an initial point to be submitted to the authorities for signing.
+        /// Used by the initiator. Generates an initial point to be submitted to the token service for signing.
         /// </summary>
         /// <param name="curve">Curve parameters</param>
-        /// <returns>The seed for a random point, the initial mask of the point, and the masked point</returns>
+        /// <returns>The seed t for a random point, the initial mask r of the point, and the masked point P</returns>
         private static (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
             var random = new SecureRandom();
@@ -63,13 +63,13 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Run by the authorities. Signs the point submitted by the app in order to create a token, and outputs a proof of validity.
+        /// Used by the token service. Signs the point submitted by the initiator in order to create a token, and outputs a proof of validity.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="P">Point submitted by the app</param>
         /// <param name="K">Public key for the token scheme</param>
         /// <param name="k">Private key for the token scheme</param>
-        /// <returns>A signed point and a Chaum-Pedersen proof verifying that the point is signed correctly</returns>
+        /// <returns>A signed point Q and a Chaum-Pedersen proof (c,v) proving that the point is signed correctly</returns>
         private static (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
         {
             // Compute Q = k*P
@@ -86,7 +86,7 @@ namespace AnonymousTokensConsole
         /// </summary>
         /// <param name="curve">The elliptic curve in Weierstrass form</param>
         /// <param name="t">The seed</param>
-        /// <returns>A random point uniquely determined by t, otherwise null</returns>
+        /// <returns>A random point T uniquely determined by seed t, otherwise null</returns>
         private static ECPoint HashToCurve(ECCurve curve, byte[] t)
         {
             ECFieldElement temp, x, ax, x3, y, y2;
@@ -116,16 +116,16 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Runs on the app. It first verifies that the incoming token is well-formed, and then removes the previously applied masking.
+        /// Used by the initiator. It first verifies that the incoming token is well-formed, and then removes the previously applied mask.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
-        /// <param name="K">Public key for the token scheme, as published by the authorities</param>
-        /// <param name="P">Masked point initially submitted to the autorities</param>
-        /// <param name="Q">Signed masked point returned from the autorities</param>
+        /// <param name="K">Public key for the token scheme</param>
+        /// <param name="P">Masked point initially submitted to the token service</param>
+        /// <param name="Q">Signed masked point returned from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
         /// <param name="z">Response from the Chaim-Pedersen proof</param>
-        /// <param name="r">App masking of the initial point</param>
-        /// <returns>A signature on the random point chosen by the app</returns>
+        /// <param name="r">Masking of the initial point</param>
+        /// <returns>A randomised signature W on the point chosen by the initiator</returns>
         private static ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             // Verify the proof (c,z).
@@ -146,11 +146,11 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Runs on Smittestopp backend. It recreates the intial point from the app, signes it, and verifies that they are equal.
+        /// Used by the token verifier. It recreates the initial point from the initiator, signs it, and verifies that they are equal.
         /// </summary>
         /// <param name="curve">Curve parameters</param>
-        /// <param name="t">Seed for the initial point chosen by the app</param>
-        /// <param name="W">Token received from the app</param>
+        /// <param name="t">Seed for the initial point chosen by the initiator</param>
+        /// <param name="W">Token received from the initiator</param>
         /// <param name="k">Secret key for the token scheme</param>
         /// <returns>True if the token is valid, otherwise false</returns>
         private static bool VerifyToken(ECCurve curve, byte[] t, ECPoint W, BigInteger k)
@@ -162,7 +162,7 @@ namespace AnonymousTokensConsole
 
         /// <summary>
         /// Creates the challenge for the Chaum-Pedersen protocol, using the strong Fiat-Shamir transformation.
-	/// Hashes all input and a fixed domain to create an unpredictable number. Used by both the app and the authorities.
+	/// Hashes all input and a fixed domain to create an unpredictable number. Used by the initiator and token service.
         /// </summary>
         /// <param name="basePoint1">Left hand side base point</param>
         /// <param name="basePoint2">Right hand side base point</param>
@@ -200,12 +200,12 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Run by the authorities. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
+        /// Used by the token service. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="k">Secret key for the token scheme, the value of which we prove existence and usage</param>
         /// <param name="K">Public key for the token scheme</param>
-        /// <param name="P">Point submitted by the app</param>
+        /// <param name="P">Point submitted by the initiator</param>
         /// <param name="Q">Point signed using the secret key</param>
         /// <returns></returns>
         private static (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, BigInteger k, ECPoint K, ECPoint P, ECPoint Q)
@@ -230,12 +230,12 @@ namespace AnonymousTokensConsole
         }
 
         /// <summary>
-        /// Runs in the app. Verifies a transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
+        /// Used by the initiator. Verifies a transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="K">Public key for the token scheme</param>
-        /// <param name="P">Point initially submitted by the app</param>
-        /// <param name="Q">Point received from the authorities</param>
+        /// <param name="P">Point initially submitted by the initiator</param>
+        /// <param name="Q">Point received from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
         /// <param name="z">Response from the Chaim-Pedersen proof</param>
         /// <returns></returns>
