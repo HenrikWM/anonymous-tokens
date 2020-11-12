@@ -69,7 +69,7 @@ namespace AnonymousTokensConsole
         /// <param name="P">Point submitted by the app</param>
         /// <param name="K">Public key for the token scheme</param>
         /// <param name="k">Private key for the token scheme</param>
-        /// <returns>A signed point Q and a Chaum-Pedersen proof (c,v) proving that the point is signed correctly</returns>
+        /// <returns>A signed point Q and a Chaum-Pedersen proof (c,z) proving that the point is signed correctly</returns>
         private static (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
         {
             // Compute Q = k*P
@@ -139,7 +139,7 @@ namespace AnonymousTokensConsole
                 Debug.Fail("Token is invalid.");
             }
 
-            // Removing the initial mask r. W = (1/r)*Q = k*P.
+            // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
             var W = Q.Multiply(rInverse);
             return W;
@@ -201,6 +201,7 @@ namespace AnonymousTokensConsole
 
         /// <summary>
         /// Used by the token service. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
+	/// The Chaum-Pedersen proof proves that the same secret key k is used to compute K = k*G and Q = k*P, without revealing k.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="k">Secret key for the token scheme, the value of which we prove existence and usage</param>
@@ -238,7 +239,7 @@ namespace AnonymousTokensConsole
         /// <param name="Q">Point received from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
-        /// <returns></returns>
+        /// <returns>Returns true if the proof is valid and otherwise returns false</returns>
         private static bool VerifyProof(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
         {
             ECPoint temp, temp2, Y, X;
@@ -257,14 +258,14 @@ namespace AnonymousTokensConsole
             return c.Equals(CreateChallenge(ecParameters.G, P, K, Q, X, Y));
         }
 		
-		/// Main will be split into three parts:
-		/// Initiator: 			running Initiate() and RandomiseToken()
-		/// TokenGenerator: 	running GenerateToken()
-		/// TokenVerifier:		running VerifyToken()
+	/// Main will be split into three parts:
+	/// Initiator: 		running Initiate() and RandomiseToken()
+	/// TokenGenerator: 	running GenerateToken()
+	/// TokenVerifier:	running VerifyToken()
         static void Main(string[] args)
         {
             // Import parameters for the elliptic curve secp256k1
-			var ecParameters = GetECParameters("secp256k1");
+	    var ecParameters = GetECParameters("secp256k1");
 
             // Generate private key k and public key K = k*G
             var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
