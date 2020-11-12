@@ -256,28 +256,26 @@ namespace AnonymousTokensConsole
             // Returns true if the challenge from the proof equals the new challenge
             return c.Equals(CreateChallenge(ecParameters.G, P, K, Q, X, Y));
         }
-
+		
+		/// Main will be split into three parts:
+		/// Initiator: 			running Initiate() and RandomiseToken()
+		/// TokenGenerator: 	running GenerateToken()
+		/// TokenVerifier:		running VerifyToken()
         static void Main(string[] args)
         {
-            var ecParameters = GetECParameters("secp256k1");
+            // Import parameters for the elliptic curve secp256k1
+			var ecParameters = GetECParameters("secp256k1");
 
             // Generate private key k and public key K = k*G
             var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
-
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
-            Console.WriteLine($"Private key:\n{ToHex(privateKey.D.ToByteArrayUnsigned())}");
-            Console.WriteLine($"Public key:\n{ToHex(publicKey.Q.GetEncoded())}");
-
             // Initiate communication with a masked point P = r*T = r*Hash(t)
-            var config = Initiate(ecParameters.Curve);
-            var t = config.t;
-
-            Console.WriteLine($"t: {ToHex(t)}");
-
-            var r = config.r;
-            var P = config.P;
+            var init = Initiate(ecParameters.Curve);
+            var t = init.t;
+            var r = init.r;
+            var P = init.P;
 
             // Generate token Q = k*P and proof (c,z) of correctness
             var token = GenerateToken(ecParameters, P, publicKey.Q, privateKey.D);
