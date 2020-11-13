@@ -21,13 +21,13 @@ namespace AnonymousTokensConsole
         static string ToHex(byte[] data) => string.Concat(data.Select(x => x.ToString("x2")));
 
         /// <summary>
-	/// Defines an elliptic curve to be used in our protocol. We will use "secp256k1".
-	/// </summary>
-	/// <param name="algorithm"></param>
-	/// <returns>
-	/// Parameters including curve constants, base point, order and underlying field.
-	/// Built-in functions allow us to compute scalar multiplications and point additions.
-	/// </returns>
+        /// Defines an elliptic curve to be used in our protocol. We will use "secp256k1".
+        /// </summary>
+        /// <param name="algorithm"></param>
+        /// <returns>
+        /// Parameters including curve constants, base point, order and underlying field.
+        /// Built-in functions allow us to compute scalar multiplications and point additions.
+        /// </returns>
         private static X9ECParameters GetECParameters(string algorithm)
         {
             return ECNamedCurveTable.GetByName(algorithm);
@@ -89,23 +89,23 @@ namespace AnonymousTokensConsole
         /// <returns>A random point T uniquely determined by seed t, otherwise null</returns>
         private static ECPoint HashToCurve(ECCurve curve, byte[] t)
         {
-            ECFieldElement temp, x, ax, x3, y, y2;
+            ECFieldElement x, ax, x3, y, y2;
 
             var P = curve.Field.Characteristic;
             var sha256 = SHA256.Create();
-            var hash = new BigInteger(sha256.ComputeHash(t));
+            var hashAsInt = new BigInteger(sha256.ComputeHash(t));
 
-            if (hash.CompareTo(BigInteger.One) < 0 || hash.CompareTo(P) >= 0)
+            // Check that the hash is within valid range
+            if (hashAsInt.CompareTo(BigInteger.One) < 0 || hashAsInt.CompareTo(P) >= 0)
                 return null;
 
             // A valid point (x,y) must satisfy: y^2 = x^3 + Ax + B mod P
-            x = curve.FromBigInteger(hash);     // x
-            ax = x.Multiply(curve.A);           // Ax
-            temp = x.Multiply(x);               // x^2
-            x3 = temp.Multiply(x);              // x^3
-            temp = x3.Add(ax);                  // x^3 + Ax
-            y2 = temp.Add(curve.B);             // y^2 = x^3 + Ax + B
-            y = y2.Sqrt();                      // y = sqrt(x^3 + Ax + B)
+            // Convert hash from BigInt to FieldElement x modulo P
+            x = curve.FromBigInteger(hashAsInt);    // x
+            ax = x.Multiply(curve.A);               // Ax
+            x3 = x.Multiply(x).Multiply(x);         // x^3
+            y2 = x3.Add(ax).Add(curve.B);           // y^2 = x^3 + Ax + B
+            y = y2.Sqrt();                          // y = sqrt(x^3 + Ax + B)
 
             // y == null if square root mod P does not exist
             if (y == null)
@@ -162,23 +162,24 @@ namespace AnonymousTokensConsole
 
         /// <summary>
         /// Creates the challenge for the Chaum-Pedersen protocol, using the strong Fiat-Shamir transformation.
-	/// Hashes all input and a fixed domain to create an unpredictable number. Used by the initiator and token service.
+	    /// Hashes all input and a fixed domain to create an unpredictable number. Used by the initiator and token service.
         /// </summary>
-        /// <param name="basePoint1">Left hand side base point</param>
-        /// <param name="basePoint2">Right hand side base point</param>
-        /// <param name="newPoint1">Left hand side basepoint-to-secret-exponent</param>
-        /// <param name="newPoint2">Right hand side basepoint-to-secret-exponent</param>
-        /// <param name="commitment1">Left hand side commitment-to-random-exponent</param>
-        /// <param name="commitment2">Right hand side commitment-to-random-exponent</param>
-        /// <returns>A random number based on all input</returns>
-        private static BigInteger CreateChallenge(ECPoint basePoint1, ECPoint basePoint2, ECPoint newPoint1, ECPoint newPoint2, ECPoint commitment1, ECPoint commitment2)
+        /// <param name="G">Curve generator</param>
+        /// <param name="P">Randomised point on curve</param>
+        /// <param name="K">Public key K = k*G</param>
+        /// <param name="Q">Signature Q = k*P</param>
+        /// <param name="X">Commitment X = r*G</param>
+        /// <param name="Y">Commitment Y = r*P</param>
+        /// <returns>A random number uniquely based on all inputs</returns>
+        private static BigInteger CreateChallenge(ECPoint G, ECPoint P, ECPoint K, ECPoint Q, ECPoint X, ECPoint Y)
         {
-            var basePoint1Encoded = basePoint1.GetEncoded();
-            var basePoint2Encoded = basePoint2.GetEncoded();
-            var newPoint1Encoded = newPoint1.GetEncoded();
-            var newPoint2Encoded = newPoint2.GetEncoded();
-            var commitment1Encoded = commitment1.GetEncoded();
-            var commitment2Encoded = commitment2.GetEncoded();
+            // Encode the ECPoint inputs
+            var GEncoded = G.GetEncoded();
+            var PEncoded = P.GetEncoded();
+            var KEncoded = K.GetEncoded();
+            var QEncoded = Q.GetEncoded();
+            var XEncoded = X.GetEncoded();
+            var YEncoded = Y.GetEncoded();
 
             // Domain separation: make sure hash is independent of other systems
             var domain = "smittestopptoken";
@@ -186,22 +187,22 @@ namespace AnonymousTokensConsole
 
             // Using concat() is best for performance: https://stackoverflow.com/a/415396
             IEnumerable<byte> points = domainEncoded
-                .Concat(basePoint1Encoded)
-                .Concat(basePoint2Encoded)
-                .Concat(newPoint1Encoded)
-                .Concat(newPoint2Encoded)
-                .Concat(commitment1Encoded)
-                .Concat(commitment2Encoded);
+                .Concat(GEncoded)
+                .Concat(PEncoded)
+                .Concat(KEncoded)
+                .Concat(QEncoded)
+                .Concat(XEncoded)
+                .Concat(YEncoded);
 
             var sha256 = SHA256.Create();
-            var hash = new BigInteger(sha256.ComputeHash(points.ToArray()));
+            var hashAsInt = new BigInteger(sha256.ComputeHash(points.ToArray()));
 
-            return hash.Mod(basePoint1.Curve.Order);
+            return hashAsInt.Mod(G.Curve.Order);
         }
 
         /// <summary>
         /// Used by the token service. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
-	/// The Chaum-Pedersen proof proves that the same secret key k is used to compute K = k*G and Q = k*P, without revealing k.
+	    /// The Chaum-Pedersen proof proves that the same secret key k is used to compute K = k*G and Q = k*P, without revealing k.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="k">Secret key for the token scheme, the value of which we prove existence and usage</param>
@@ -242,30 +243,24 @@ namespace AnonymousTokensConsole
         /// <returns>Returns true if the proof is valid and otherwise returns false</returns>
         private static bool VerifyProof(X9ECParameters ecParameters, ECPoint K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
         {
-            ECPoint temp, temp2, Y, X;
+            // Compute X = z*G + c*K = r*G
+            var X = ecParameters.G.Multiply(z).Add(K.Multiply(c));
 
-            // Compute z*G + c*K = r*G = X
-            temp = ecParameters.G.Multiply(z);
-            temp2 = K.Multiply(c);
-            X = temp.Add(temp2);
-
-            // Compute z*P + c*Q = r*P = Y
-            temp = P.Multiply(z);
-            temp2 = Q.Multiply(c);
-            Y = temp.Add(temp2);
+            // Compute Y = z*P + c*Q = r*P
+            var Y = P.Multiply(z).Add(Q.Multiply(c));
 
             // Returns true if the challenge from the proof equals the new challenge
             return c.Equals(CreateChallenge(ecParameters.G, P, K, Q, X, Y));
         }
-		
-	/// Main will be split into three parts:
-	/// Initiator: 		running Initiate() and RandomiseToken()
-	/// TokenGenerator: 	running GenerateToken()
-	/// TokenVerifier:	running VerifyToken()
+
+        /// Main will be split into three parts:
+        /// Initiator: 		    running Initiate() and RandomiseToken()
+        /// TokenGenerator: 	running GenerateToken()
+        /// TokenVerifier:	    running VerifyToken()
         static void Main(string[] args)
         {
             // Import parameters for the elliptic curve secp256k1
-	    var ecParameters = GetECParameters("secp256k1");
+            var ecParameters = GetECParameters("secp256k1");
 
             // Generate private key k and public key K = k*G
             var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
@@ -284,7 +279,7 @@ namespace AnonymousTokensConsole
             var c = token.c;
             var z = token.z;
 
-            // Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*P.
+            // Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T.
             // Also checks that proof (c,z) is correct.
             var W = RandomiseToken(ecParameters, publicKey.Q, P, Q, c, z, r);
 
