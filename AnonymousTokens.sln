@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{4DDE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokensShared", "src\Shared\AnonymousTokensShared\AnonymousTokensShared.csproj", "{D98EB88A-9922-4AA5-8C97-6206C7196CD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Backend", "src\Server\Server.Backend\Server.Backend.csproj", "{E691A98B-3EBC-4AE7-8858-67601E805909}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.Backend.Api", "src\Server\Server.Backend.Api\Server.Backend.Api.csproj", "{E691A98B-3EBC-4AE7-8858-67601E805909}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.VerificationBackend", "src\Server\Server.VerificationBackend\Server.VerificationBackend.csproj", "{A4143A14-789E-4AD0-BAD9-BF5B32E24EC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.VerificationBackend.Api", "src\Server\Server.VerificationBackend.Api\Server.VerificationBackend.Api.csproj", "{A4143A14-789E-4AD0-BAD9-BF5B32E24EC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
