@@ -1,0 +1,31 @@
+@startuml
+skinparam BoxPadding 70
+
+title User sends a message
+actor User
+
+
+box "Client-side app"
+participant Initiator
+end box
+
+box "Server-side backend system"
+
+participant TokenGenerator
+participant TokenVerifier
+end box
+
+User->Initiator: sendMessage(message)
+activate Initiator
+Initiator->Initiator: << initiate >>
+activate Initiator
+Initiator->Initiator: curve,K
+Initiator->TokenGenerator: curve,k,K
+Initiator->TokenVerifier: curve,k,K
+
+deactivate Initiator
+
+TokenGenerator->Initiator: << generated token >>
+
+deactivate Initiator
+@enduml
