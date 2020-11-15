@@ -12,6 +12,30 @@ This Proof-of-Concept contains:
 - Randomizing the token and verifies proof of correctness
 - Verification of token
 
+## How to build
+
+- [Install](https://www.microsoft.com/net/download/core#/current) the latest .NET Core 3.1 SDK
+- Install Git
+- Clone this repo
+
+### Build & run with Visual Studio
+
+- Open `AnonymousTokens.sln` in Visual Studio
+- In Visual Studio right-click on the solution **AnonymousTokens** in the Solution Explorer window and choose **Set startup projects...**
+- Select **Multiple startup projects** and set **Action** to **Start** on projects:
+  - Client.Console
+  - Server.Backend
+  - Server.VerificationBackend
+- Build & run using F5 in Visual Studio
+
+### Build & run with a terminal
+
+- In the root of the cloned repo open 3 terminal windows.
+- Run each in a separate terminal:
+  - `dotnet run --project .\src\Client\Client.Console\Client.Console.csproj`
+  - `dotnet run --project .\src\Server\Server.Backend\Server.Backend.csproj`
+  - `dotnet run --project .\src\Server\Server.VerificationBackend\Server.VerificationBackend.csproj`
+
 ## Future work
 
 - Performance-pass
