@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokensConsole", "src\Client\AnonymousTokensConsole\AnonymousTokensConsole.csproj", "{CCB7635D-7D0F-4371-AC14-828E208790AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Console", "src\Client\Client.Console\Client.Console.csproj", "{CCB7635D-7D0F-4371-AC14-828E208790AF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client-side", "Client-side", "{E4DAF051-5F2C-458A-8AD3-2E0B1E7D3C52}"
 EndProject
