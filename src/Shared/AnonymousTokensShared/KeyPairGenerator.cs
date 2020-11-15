@@ -4,7 +4,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
-namespace AnonymousTokensConsole
+namespace AnonymousTokensShared
 {
     public static class KeyPairGenerator
     {

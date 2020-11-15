@@ -2,7 +2,7 @@
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
-namespace AnonymousTokensConsole
+namespace AnonymousTokensShared
 {
     public class RandomCurveNumberGenerator
     {
