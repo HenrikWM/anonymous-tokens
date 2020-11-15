@@ -1,0 +1,63 @@
+﻿using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Security;
+
+using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
+
+namespace AnonymousTokensShared.Protocol
+{
+    public class TokenGenerator
+    {
+        /// <summary>
+        /// Used by the token service. Signs the point submitted by the initiator in order to create a token, and outputs a proof of validity.
+        /// </summary>
+        /// <param name="ecParameters">Curve parameters</param>
+        /// <param name="P">Point submitted by the app</param>
+        /// <param name="K">Public key for the token scheme</param>
+        /// <param name="k">Private key for the token scheme</param>
+        /// <returns>A signed point Q and a Chaum-Pedersen proof (c,z) proving that the point is signed correctly</returns>
+        public (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
+        {
+            // Compute Q = k*P
+            var Q = P.Multiply(k);
+
+            // Chaum-Pedersen proof of correct signature
+            var proof = CreateProof(ecParameters, k, K, P, Q);
+
+            return (Q, proof.c, proof.z);
+        }
+
+        /// <summary>
+        /// Used by the token service. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
+        /// The Chaum-Pedersen proof proves that the same secret key k is used to compute K = k*G and Q = k*P, without revealing k.
+        /// </summary>
+        /// <param name="ecParameters">Curve parameters</param>
+        /// <param name="k">Secret key for the token scheme, the value of which we prove existence and usage</param>
+        /// <param name="K">Public key for the token scheme</param>
+        /// <param name="P">Point submitted by the initiator</param>
+        /// <param name="Q">Point signed using the secret key</param>
+        /// <returns></returns>
+        private (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, BigInteger k, ECPoint K, ECPoint P, ECPoint Q)
+        {
+            var random = new SecureRandom();
+
+            // Sample a random integer 0 < r < N
+            BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(ecParameters.Curve, random);
+
+            // Computes X = r*G
+            ECPoint X = ecParameters.G.Multiply(r);
+
+            // Computes Y = r*P
+            ECPoint Y = P.Multiply(r);
+
+            BigInteger c = CPChallengeGenerator.CreateChallenge(ecParameters.G, P, K, Q, X, Y);
+
+            // Compute proof z = r - ck mod N
+            BigInteger z = r.Subtract(c.Multiply(k)).Mod(ecParameters.Curve.Order);
+
+            return (c, z);
+        }
+
+
+    }
+}

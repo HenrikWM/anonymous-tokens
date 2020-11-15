@@ -1,0 +1,23 @@
+﻿using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
+
+namespace AnonymousTokensShared.Protocol
+{
+    public class TokenVerifier
+    {
+        /// <summary>
+        /// Used by the token verifier. It recreates the initial point from the initiator, signs it, and verifies that they are equal.
+        /// </summary>
+        /// <param name="curve">Curve parameters</param>
+        /// <param name="t">Seed for the initial point chosen by the initiator</param>
+        /// <param name="W">Token received from the initiator</param>
+        /// <param name="k">Secret key for the token scheme</param>
+        /// <returns>True if the token is valid, otherwise false</returns>
+        public bool VerifyToken(ECCurve curve, byte[] t, ECPoint W, BigInteger k)
+        {
+            var T = ECCurveHash.HashToCurve(curve, t);
+            var V = T.Multiply(k);
+            return V.Equals(W);
+        }
+    }
+}

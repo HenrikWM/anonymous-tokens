@@ -1,5 +1,6 @@
 @startuml
 skinparam BoxPadding 70
+skinparam ParticipantPadding 20
 
 title User sends a message
 actor User
@@ -17,15 +18,16 @@ end box
 
 User->Initiator: sendMessage(message)
 activate Initiator
-Initiator->Initiator: << initiate >>
+Initiator->Initiator: init()
 activate Initiator
-Initiator->Initiator: curve,K
-Initiator->TokenGenerator: curve,k,K
-Initiator->TokenVerifier: curve,k,K
+Initiator-->Initiator: curve,K
+Initiator-->TokenGenerator: curve,k,K
+Initiator-->TokenVerifier: curve,k,K
 
 deactivate Initiator
 
-TokenGenerator->Initiator: << generated token >>
+Initiator->TokenGenerator: generateToken()
+TokenGenerator->Initiator: token
 
 deactivate Initiator
 @enduml

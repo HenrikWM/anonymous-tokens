@@ -4,7 +4,7 @@ using Org.BouncyCastle.Security;
 
 namespace AnonymousTokensShared
 {
-    public class RandomCurveNumberGenerator
+    public static class ECCurveRandomNumberGenerator
     {
         /// <summary>
         /// Generate a random number r such that 0 < r < curve.Order
@@ -28,6 +28,5 @@ namespace AnonymousTokensShared
 
             return r;
         }
-
     }
 }
