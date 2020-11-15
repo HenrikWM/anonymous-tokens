@@ -21,7 +21,7 @@ jobs:
       run: dotnet restore ./AnonymousTokens.sln
     - name: Build client
       run: dotnet build --configuration Release --no-restore ./src/Client/Client.Console/Client.Console.csproj
-    - name: Build backend api
-      run: dotnet build --configuration Release --no-restore ./src/Server/Server.Backend.Api/Server.Backend.Api.csproj
-    - name: Build verification api
-      run: dotnet build --configuration Release --no-restore ./src/Server/Server.VerificationBackend.Api/Server.VerificationBackend.Api.csproj     
+    - name: Build token-generation api
+      run: dotnet build --configuration Release --no-restore ./src/Server/Server.TokenGeneration.Api/Server.TokenGeneration.Api.csproj
+    - name: Build token-verification api
+      run: dotnet build --configuration Release --no-restore ./src/Server/Server.TokenVerification.Api/Server.TokenVerification.Api.csproj     
