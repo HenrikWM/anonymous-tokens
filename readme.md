@@ -33,8 +33,8 @@ This Proof-of-Concept contains:
 - In the root of the cloned repo open 3 terminal windows.
 - Run each in a separate terminal:
   - `dotnet run --project .\src\Client\Client.Console\Client.Console.csproj`
-  - `dotnet run --project .\src\Server\Server.Backend.Api\Server.Backend.Api.csproj`
-  - `dotnet run --project .\src\Server\Server.VerificationBackend.Api\Server.VerificationBackend.Api.csproj`
+  - `dotnet run --project .\src\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj`
+  - `dotnet run --project .\src\Server\Server.TokenVerification.Api\Server.TokenVerification.Api.csproj`
 
 ## Future work
 
