@@ -24,9 +24,9 @@ namespace AnonymousTokensConsole
             return ECNamedCurveTable.GetByName(algorithm);
         }
 
-        private static readonly Initiator _initiator = new Initiator();
-        private static readonly TokenVerifier _tokenVerifier = new TokenVerifier();
         private static TokenGenerator _tokenGenerator;
+        private static Initiator _initiator;
+        private static readonly TokenVerifier _tokenVerifier = new TokenVerifier();
 
         static void Main(string[] args)
         {
@@ -36,10 +36,11 @@ namespace AnonymousTokensConsole
             // Generate private key k and public key K = k*G
             var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
 
-            _tokenGenerator = new TokenGenerator(keyPair);
-
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
+
+            _tokenGenerator = new TokenGenerator(publicKey, privateKey);
+            _initiator = new Initiator(publicKey);
 
             // Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(ecParameters.Curve);
@@ -55,7 +56,7 @@ namespace AnonymousTokensConsole
 
             // Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T.
             // Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(ecParameters, publicKey.Q, P, Q, c, z, r);
+            var W = _initiator.RandomiseToken(ecParameters, P, Q, c, z, r);
 
             // Verify that the token (t,W) is correct.
             if (_tokenVerifier.VerifyToken(ecParameters.Curve, t, W, privateKey.D))
