@@ -34,7 +34,8 @@ namespace AnonymousTokensConsole
             var ecParameters = GetECParameters("secp256k1");
 
             // Generate private key k and public key K = k*G
-            var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
+            var keyPairGenerator = new InMemoryKeyPairGenerator();
+            var keyPair = keyPairGenerator.CreateKeyPair(ecParameters);
 
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;

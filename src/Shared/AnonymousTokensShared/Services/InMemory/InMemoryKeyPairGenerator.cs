@@ -6,14 +6,15 @@ using Org.BouncyCastle.Security;
 
 namespace AnonymousTokensShared
 {
-    public static class KeyPairGenerator
+
+    public class InMemoryKeyPairGenerator : IKeyPairGenerator
     {
         /// <summary>
         /// Generate private key k and public key K.
         /// </summary>
         /// <param name="ecParameters">The Elliptic Curve X9ECParameters-parameters with the curve, points etc.</param>
         /// <returns>The key pair with private and public key</returns>
-        public static AsymmetricCipherKeyPair CreateKeyPair(X9ECParameters ecParameters)
+        public AsymmetricCipherKeyPair CreateKeyPair(X9ECParameters ecParameters)
         {
             var generator = new ECKeyPairGenerator("EC");
 
