@@ -1,5 +1,4 @@
 ﻿using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
@@ -21,13 +20,14 @@ namespace AnonymousTokensShared.Protocol
         private readonly ECPoint _K;
 
         /// <summary>
-        /// Creates an instance of TokenGeneratro with a key pair.
+        /// Creates an instance of TokenGenerator with a key pair.
         /// </summary>
-        /// <param name="keyPair">The AsymmetricCipherKeyPair containing the public key K and private key k.</param>
-        public TokenGenerator(AsymmetricCipherKeyPair keyPair)
+        /// <param name="publicKeyParameters">Parameters containing the public key K.</param>
+        /// <param name="privateKeyParameters">Parameters containing the private key k.</param>
+        public TokenGenerator(ECPublicKeyParameters publicKeyParameters, ECPrivateKeyParameters privateKeyParameters)
         {
-            _k = (keyPair.Private as ECPrivateKeyParameters).D;
-            _K = (keyPair.Public as ECPublicKeyParameters).Q;
+            _k = privateKeyParameters.D;
+            _K = publicKeyParameters.Q;
         }
 
         /// <summary>
