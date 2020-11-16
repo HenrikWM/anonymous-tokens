@@ -9,8 +9,7 @@ namespace AnonymousTokensShared
     public static class KeyPairGenerator
     {
         /// <summary>
-        /// Generate private key k,
-        /// and public key K.
+        /// Generate private key k and public key K.
         /// </summary>
         /// <param name="ecParameters">The Elliptic Curve X9ECParameters-parameters with the curve, points etc.</param>
         /// <returns>The key pair with private and public key</returns>

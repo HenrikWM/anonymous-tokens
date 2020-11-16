@@ -26,7 +26,7 @@ namespace AnonymousTokensConsole
 
         private static readonly Initiator _initiator = new Initiator();
         private static readonly TokenVerifier _tokenVerifier = new TokenVerifier();
-        private static readonly TokenGenerator _tokenGenerator = new TokenGenerator();
+        private static TokenGenerator _tokenGenerator;
 
         static void Main(string[] args)
         {
@@ -35,6 +35,9 @@ namespace AnonymousTokensConsole
 
             // Generate private key k and public key K = k*G
             var keyPair = KeyPairGenerator.CreateKeyPair(ecParameters);
+
+            _tokenGenerator = new TokenGenerator(keyPair);
+
             var privateKey = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
@@ -45,7 +48,7 @@ namespace AnonymousTokensConsole
             var P = init.P;
 
             // Generate token Q = k*P and proof (c,z) of correctness
-            var token = _tokenGenerator.GenerateToken(ecParameters, P, publicKey.Q, privateKey.D);
+            var token = _tokenGenerator.GenerateToken(ecParameters, P);
             var Q = token.Q;
             var c = token.c;
             var z = token.z;

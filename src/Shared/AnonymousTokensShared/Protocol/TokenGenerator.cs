@@ -1,4 +1,6 @@
 ﻿using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 
@@ -9,20 +11,38 @@ namespace AnonymousTokensShared.Protocol
     public class TokenGenerator
     {
         /// <summary>
+        /// Private key for the token scheme.
+        /// </summary>
+        private readonly BigInteger _k;
+
+        /// <summary>
+        /// Public key for the token scheme.
+        /// </summary>
+        private readonly ECPoint _K;
+
+        /// <summary>
+        /// Creates an instance of TokenGeneratro with a key pair.
+        /// </summary>
+        /// <param name="keyPair">The AsymmetricCipherKeyPair containing the public key K and private key k.</param>
+        public TokenGenerator(AsymmetricCipherKeyPair keyPair)
+        {
+            _k = (keyPair.Private as ECPrivateKeyParameters).D;
+            _K = (keyPair.Public as ECPublicKeyParameters).Q;
+        }
+
+        /// <summary>
         /// Used by the token service. Signs the point submitted by the initiator in order to create a token, and outputs a proof of validity.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="P">Point submitted by the app</param>
-        /// <param name="K">Public key for the token scheme</param>
-        /// <param name="k">Private key for the token scheme</param>
         /// <returns>A signed point Q and a Chaum-Pedersen proof (c,z) proving that the point is signed correctly</returns>
-        public (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P, ECPoint K, BigInteger k)
+        public (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P)
         {
             // Compute Q = k*P
-            var Q = P.Multiply(k);
+            var Q = P.Multiply(_k);
 
             // Chaum-Pedersen proof of correct signature
-            var proof = CreateProof(ecParameters, k, K, P, Q);
+            var proof = CreateProof(ecParameters, P, Q);
 
             return (Q, proof.c, proof.z);
         }
@@ -37,7 +57,7 @@ namespace AnonymousTokensShared.Protocol
         /// <param name="P">Point submitted by the initiator</param>
         /// <param name="Q">Point signed using the secret key</param>
         /// <returns></returns>
-        private (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, BigInteger k, ECPoint K, ECPoint P, ECPoint Q)
+        private (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, ECPoint P, ECPoint Q)
         {
             var random = new SecureRandom();
 
@@ -50,10 +70,10 @@ namespace AnonymousTokensShared.Protocol
             // Computes Y = r*P
             ECPoint Y = P.Multiply(r);
 
-            BigInteger c = CPChallengeGenerator.CreateChallenge(ecParameters.G, P, K, Q, X, Y);
+            BigInteger c = CPChallengeGenerator.CreateChallenge(ecParameters.G, P, _K, Q, X, Y);
 
             // Compute proof z = r - ck mod N
-            BigInteger z = r.Subtract(c.Multiply(k)).Mod(ecParameters.Curve.Order);
+            BigInteger z = r.Subtract(c.Multiply(_k)).Mod(ecParameters.Curve.Order);
 
             return (c, z);
         }
