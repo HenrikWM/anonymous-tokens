@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using AnonymousTokensShared.Services.InMemory;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +29,9 @@ namespace Server.Backend
 
             app.UseEndpoints(endpoints =>
             {
+                var publicKeyStore = new InMemoryPublicKeyStore();
+                var publicKey = publicKeyStore.Get();
+
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Hello World!");

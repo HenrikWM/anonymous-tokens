@@ -4,10 +4,10 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
-namespace AnonymousTokensShared
+namespace AnonymousTokensShared.Services
 {
 
-    public class InMemoryKeyPairGenerator : IKeyPairGenerator
+    public class KeyPairGenerator : IKeyPairGenerator
     {
         /// <summary>
         /// Generate private key k and public key K.
