@@ -26,7 +26,7 @@ namespace AnonymousTokensConsole
 
         private static TokenGenerator _tokenGenerator;
         private static Initiator _initiator;
-        private static readonly TokenVerifier _tokenVerifier = new TokenVerifier();
+        private static TokenVerifier _tokenVerifier;
 
         static void Main(string[] args)
         {
@@ -40,6 +40,7 @@ namespace AnonymousTokensConsole
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
             _tokenGenerator = new TokenGenerator(publicKey, privateKey);
+            _tokenVerifier = new TokenVerifier(privateKey);
             _initiator = new Initiator(publicKey);
 
             // Initiate communication with a masked point P = r*T = r*Hash(t)
@@ -59,7 +60,7 @@ namespace AnonymousTokensConsole
             var W = _initiator.RandomiseToken(ecParameters, P, Q, c, z, r);
 
             // Verify that the token (t,W) is correct.
-            if (_tokenVerifier.VerifyToken(ecParameters.Curve, t, W, privateKey.D))
+            if (_tokenVerifier.VerifyToken(ecParameters.Curve, t, W))
             {
                 Console.WriteLine("Token is valid.");
             }
