@@ -23,10 +23,10 @@ namespace AnonymousTokensShared.Protocol
         /// Creates an instance of TokenGenerator with a key pair.
         /// </summary>
         /// <param name="publicKeyParameters">Parameters containing the public key K.</param>
-        /// <param name="privateKeyParameters">Parameters containing the private key k.</param>
-        public TokenGenerator(ECPublicKeyParameters publicKeyParameters, ECPrivateKeyParameters privateKeyParameters)
+        /// <param name="k">The private key.</param>
+        public TokenGenerator(ECPublicKeyParameters publicKeyParameters, BigInteger k)
         {
-            _k = privateKeyParameters.D;
+            _k = k;
             _K = publicKeyParameters.Q;
         }
 

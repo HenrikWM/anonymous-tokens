@@ -1,9 +1,9 @@
-﻿using Org.BouncyCastle.Crypto.Parameters;
+﻿using Org.BouncyCastle.Math;
 
 namespace AnonymousTokensShared.Services
 {
     public interface IPrivateKeyStore
     {
-        public ECPrivateKeyParameters Get();
+        public BigInteger Get();
     }
 }

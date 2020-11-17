@@ -1,5 +1,4 @@
-﻿using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
+﻿using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
 namespace AnonymousTokensShared.Protocol
@@ -14,10 +13,10 @@ namespace AnonymousTokensShared.Protocol
         /// <summary>
         /// Creates an instance of TokenGenerator with a key pair.
         /// </summary>        
-        /// <param name="privateKeyParameters">Parameters containing the private key k.</param>
-        public TokenVerifier(ECPrivateKeyParameters privateKeyParameters)
+        /// <param name="k">The private key.</param>
+        public TokenVerifier(BigInteger k)
         {
-            _k = privateKeyParameters.D;
+            _k = k;
         }
 
         /// <summary>
