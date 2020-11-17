@@ -36,11 +36,12 @@ This Proof-of-Concept contains:
   - `dotnet run --project .\src\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj`
   - `dotnet run --project .\src\Server\Server.TokenVerification.Api\Server.TokenVerification.Api.csproj`
 
-## Future work
+## Roadmap
 
-- Performance-pass
-- Usage of `SecureRandom` - re-use vs instantiation per use
 - Test-coverage
+- Performance-pass
+- Investigate usage of `SecureRandom` - re-use vs instantiation per use
+- Publish NuGet-package
 
 ## Sources
 
