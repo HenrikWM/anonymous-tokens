@@ -1,7 +1,8 @@
 ﻿using AnonymousTokensShared.Protocol;
-using AnonymousTokensShared.Services.InMemory;
+using AnonymousTokensShared.Services;
 
 using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Parameters;
 
 using System;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ namespace AnonymousTokensConsole
     class Program
     {
         /// <summary>
-        /// Defines an elliptic curve to be used in our protocol. We will use "secp256k1".
+        /// Defines an elliptic curve to be used in our protocol. We will use "prime256v1".
         /// </summary>
         /// <param name="algorithm"></param>
         /// <returns>
@@ -20,7 +21,7 @@ namespace AnonymousTokensConsole
         /// </returns>
         private static X9ECParameters GetECParameters(string algorithm)
         {
-            return ECNamedCurveTable.GetByName(algorithm);
+            return X962NamedCurves.GetByName(algorithm);
         }
 
         private static TokenGenerator _tokenGenerator;
@@ -29,20 +30,20 @@ namespace AnonymousTokensConsole
 
         static void Main(string[] args)
         {
-            // Import parameters for the elliptic curve secp256k1
-            var ecParameters = GetECParameters("secp256k1");
+            // Import parameters for the elliptic curve prime256v1
+            var ecParameters = GetECParameters("prime256v1");
 
             // Generate private key k and public key K = k*G            
-            //var keyPairGenerator = new KeyPairGenerator();
-            //var keyPair = keyPairGenerator.CreateKeyPair(ecParameters);
+            var keyPairGenerator = new KeyPairGenerator();
+            var keyPair = keyPairGenerator.CreateKeyPair(ecParameters);
 
-            //var privateKey = keyPair.Private as ECPrivateKeyParameters;
-            //var publicKey = keyPair.Public as ECPublicKeyParameters;
-            var privateKeyStore = new InMemoryPrivateKeyStore();
-            var privateKey = privateKeyStore.Get();
+            var privateKey = keyPair.Private as ECPrivateKeyParameters;
+            var publicKey = keyPair.Public as ECPublicKeyParameters;
+            //var privateKeyStore = new InMemoryPrivateKeyStore();
+            //var privateKey = privateKeyStore.Get();
 
-            var publicKeyStore = new InMemoryPublicKeyStore();
-            var publicKey = publicKeyStore.Get();
+            //var publicKeyStore = new InMemoryPublicKeyStore();
+            //var publicKey = publicKeyStore.Get();
 
             _tokenGenerator = new TokenGenerator(publicKey, privateKey);
             _tokenVerifier = new TokenVerifier(privateKey);
