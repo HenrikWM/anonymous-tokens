@@ -1,4 +1,5 @@
 
+using AnonymousTokensShared.Protocol;
 using AnonymousTokensShared.Services.InMemory;
 
 using Microsoft.AspNetCore.Builder;
@@ -31,6 +32,11 @@ namespace Server.Backend
             {
                 var publicKeyStore = new InMemoryPublicKeyStore();
                 var publicKey = publicKeyStore.Get();
+
+                var privateKeyStore = new InMemoryPrivateKeyStore();
+                var privateKey = privateKeyStore.Get();
+
+                var tokenGenerator = new TokenGenerator(publicKey, privateKey);
 
                 endpoints.MapGet("/", async context =>
                 {

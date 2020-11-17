@@ -1,4 +1,5 @@
 
+using AnonymousTokensShared.Protocol;
 using AnonymousTokensShared.Services.InMemory;
 
 using Microsoft.AspNetCore.Builder;
@@ -31,6 +32,10 @@ namespace Server.VerificationBackend
             {
                 var privateKeyStore = new InMemoryPrivateKeyStore();
                 var privateKey = privateKeyStore.Get();
+
+                var tokenVerifier = new TokenVerifier(privateKey);
+
+                // TODO: verify token
 
                 endpoints.MapGet("/", async context =>
                 {
