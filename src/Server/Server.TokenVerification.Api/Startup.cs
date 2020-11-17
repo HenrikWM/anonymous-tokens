@@ -4,9 +4,11 @@ using AnonymousTokensShared.Services.InMemory;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.EC;
 
 namespace Server.VerificationBackend
 {
@@ -30,6 +32,8 @@ namespace Server.VerificationBackend
 
             app.UseEndpoints(endpoints =>
             {
+                var ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
+
                 var privateKeyStore = new InMemoryPrivateKeyStore();
                 var privateKey = privateKeyStore.Get();
 
@@ -37,9 +41,20 @@ namespace Server.VerificationBackend
 
                 // TODO: verify token
 
-                endpoints.MapGet("/", async context =>
+                endpoints.MapPost("/token/verify", async context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    //var t = context.Request.Query["t"];
+                    //var W = context.Request.Query["W"];
+
+                    //// Verify that the token (t,W) is correct.
+                    //if (tokenVerifier.VerifyToken(ecParameters.Curve, t, W))
+                    //{
+                    //    await context.Response.WriteAsync("Token valid!");
+                    //}
+                    //else
+                    //{
+                    //    await context.Response.WriteAsync("Token is invalid!");
+                    //}
                 });
             });
         }

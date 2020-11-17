@@ -1,4 +1,7 @@
-﻿using AnonymousTokensShared.Protocol;
+﻿
+using AnonymousTokensConsole.ApiClients.TokenGeneration;
+
+using AnonymousTokensShared.Protocol;
 using AnonymousTokensShared.Services.InMemory;
 
 using Org.BouncyCastle.Asn1;
@@ -7,15 +10,16 @@ using Org.BouncyCastle.Crypto.EC;
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace AnonymousTokensConsole
 {
     class Program
     {
         /// <summary>
-        /// Defines an elliptic curve to be used in our protocol. We will use "prime256v1".
+        /// Defines an elliptic curve to be used in our protocol.
         /// </summary>
-        /// <param name="algorithm"></param>
+        /// <param name="iod">The object identifier for the algorith to use.</param>
         /// <returns>
         /// Parameters including curve constants, base point, order and underlying field.
         /// Built-in functions allow us to compute scalar multiplications and point additions.
@@ -25,43 +29,46 @@ namespace AnonymousTokensConsole
             return CustomNamedCurves.GetByOid(oid);
         }
 
-        private static TokenGenerator _tokenGenerator;
         private static Initiator _initiator;
         private static TokenVerifier _tokenVerifier;
 
-        static void Main(string[] args)
+        private static TokenGenerationApiClient _tokenGenerationClient = new TokenGenerationApiClient();
+
+        static async Task Main(string[] args)
         {
+            // TODO: Get BankID JWT and add to HttpClients
+
             // Import parameters for the elliptic curve prime256v1
             var ecParameters = GetECParameters(X9ObjectIdentifiers.Prime256v1);
-
-            // Generate private key k and public key K = k*G
-            var privateKeyStore = new InMemoryPrivateKeyStore();
-            var privateKey = privateKeyStore.Get();
 
             var publicKeyStore = new InMemoryPublicKeyStore();
             var publicKey = publicKeyStore.Get();
 
-            _tokenGenerator = new TokenGenerator(publicKey, privateKey);
-            _tokenVerifier = new TokenVerifier(privateKey);
-            _initiator = new Initiator(publicKey);
+            var privateKeyStore = new InMemoryPrivateKeyStore();
+            var privateKey = privateKeyStore.Get();
 
-            // Initiate communication with a masked point P = r*T = r*Hash(t)
+            _initiator = new Initiator(publicKey);
+            _tokenVerifier = new TokenVerifier(privateKey);
+
+            // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(ecParameters.Curve);
             var t = init.t;
             var r = init.r;
             var P = init.P;
 
-            // Generate token Q = k*P and proof (c,z) of correctness
-            var token = _tokenGenerator.GenerateToken(ecParameters, P);
-            var Q = token.Q;
-            var c = token.c;
-            var z = token.z;
+            // 2. Generate token Q = k*P and proof (c,z) of correctness
+            var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
 
-            // Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T.
-            // Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(ecParameters, P, Q, c, z, r);
+            // 3. Verify proof (ingen hemmelig info) - kan flyttes til et bevis-API. Brukt av både TokenGenerator og Initiator(appen)
+            if (_initiator.VerifyProof(ecParameters, P, Q, proofC, proofZ) == false)
+            {
+                throw new Exception("Unable to verify proof.");
+            }
 
-            // Verify that the token (t,W) is correct.
+            // 4. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
+            var W = _initiator.RandomiseToken(ecParameters, P, Q, proofC, proofZ, r);
+
+            // 5. Verify that the token (t,W) is correct.
             if (_tokenVerifier.VerifyToken(ecParameters.Curve, t, W))
             {
                 Console.WriteLine("Token is valid.");
