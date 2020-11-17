@@ -1,8 +1,9 @@
 ﻿using AnonymousTokensShared.Protocol;
-using AnonymousTokensShared.Services;
+using AnonymousTokensShared.Services.InMemory;
 
+using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.EC;
 
 using System;
 using System.Diagnostics;
@@ -19,9 +20,9 @@ namespace AnonymousTokensConsole
         /// Parameters including curve constants, base point, order and underlying field.
         /// Built-in functions allow us to compute scalar multiplications and point additions.
         /// </returns>
-        private static X9ECParameters GetECParameters(string algorithm)
+        private static X9ECParameters GetECParameters(DerObjectIdentifier oid)
         {
-            return X962NamedCurves.GetByName(algorithm);
+            return CustomNamedCurves.GetByOid(oid);
         }
 
         private static TokenGenerator _tokenGenerator;
@@ -31,19 +32,14 @@ namespace AnonymousTokensConsole
         static void Main(string[] args)
         {
             // Import parameters for the elliptic curve prime256v1
-            var ecParameters = GetECParameters("prime256v1");
+            var ecParameters = GetECParameters(X9ObjectIdentifiers.Prime256v1);
 
-            // Generate private key k and public key K = k*G            
-            var keyPairGenerator = new KeyPairGenerator();
-            var keyPair = keyPairGenerator.CreateKeyPair(ecParameters);
+            // Generate private key k and public key K = k*G
+            var privateKeyStore = new InMemoryPrivateKeyStore();
+            var privateKey = privateKeyStore.Get();
 
-            var privateKey = keyPair.Private as ECPrivateKeyParameters;
-            var publicKey = keyPair.Public as ECPublicKeyParameters;
-            //var privateKeyStore = new InMemoryPrivateKeyStore();
-            //var privateKey = privateKeyStore.Get();
-
-            //var publicKeyStore = new InMemoryPublicKeyStore();
-            //var publicKey = publicKeyStore.Get();
+            var publicKeyStore = new InMemoryPublicKeyStore();
+            var publicKey = publicKeyStore.Get();
 
             _tokenGenerator = new TokenGenerator(publicKey, privateKey);
             _tokenVerifier = new TokenVerifier(privateKey);
