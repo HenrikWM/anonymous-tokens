@@ -4,11 +4,15 @@ using Org.BouncyCastle.Math;
 
 namespace AnonymousTokensShared.Services.InMemory
 {
-    public class InMemoryPrivateKeyStore : InMemoryStore, IPrivateKeyStore
+    public class InMemoryPrivateKeyStore : IPrivateKeyStore
     {
+        private const string ResourceFile = "private-key.pem";
+
         public BigInteger Get()
         {
-            var keyPair = (AsymmetricCipherKeyPair)LoadPemResource("private-key.pem");
+            var resource = $"{EmbeddedResourceConstants.ResourceBasePath}{ResourceFile}";
+
+            var keyPair = (AsymmetricCipherKeyPair)EmbeddedPemResource.Load(resource);
 
             return ((ECPrivateKeyParameters)keyPair.Private).D;
         }

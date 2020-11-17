@@ -3,11 +3,15 @@
 namespace AnonymousTokensShared.Services.InMemory
 {
 
-    public class InMemoryPublicKeyStore : InMemoryStore, IPublicKeyStore
+    public class InMemoryPublicKeyStore : IPublicKeyStore
     {
+        private const string ResourceFile = "public-key.pem";
+
         public ECPublicKeyParameters Get()
         {
-            return (ECPublicKeyParameters)LoadPemResource("public-key.pem");
+            var resource = $"{EmbeddedResourceConstants.ResourceBasePath}{ResourceFile}";
+
+            return (ECPublicKeyParameters)EmbeddedPemResource.Load(resource);
         }
     }
 }
