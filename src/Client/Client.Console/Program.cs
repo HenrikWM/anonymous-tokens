@@ -41,7 +41,7 @@ namespace AnonymousTokensConsole
             // 2. Generate token Q = k*P and proof (c,z) of correctness
             var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
 
-            // 3. Verify proof (ingen hemmelig info)
+            // 3. Verify proof
             if (_initiator.VerifyProof(ecParameters, P, Q, proofC, proofZ) == false)
             {
                 throw new Exception("Unable to verify proof.");
