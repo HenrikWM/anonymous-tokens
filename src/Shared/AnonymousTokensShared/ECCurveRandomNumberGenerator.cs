@@ -2,9 +2,9 @@
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
-namespace AnonymousTokensConsole
+namespace AnonymousTokensShared
 {
-    public class RandomCurveNumberGenerator
+    public static class ECCurveRandomNumberGenerator
     {
         /// <summary>
         /// Generate a random number r such that 0 < r < curve.Order
@@ -28,6 +28,5 @@ namespace AnonymousTokensConsole
 
             return r;
         }
-
     }
 }

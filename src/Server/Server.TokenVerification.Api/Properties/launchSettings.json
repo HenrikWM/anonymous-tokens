@@ -1,0 +1,11 @@
+﻿{
+  "profiles": {    
+    "Server.VerificationBackend": {
+      "commandName": "Project",
+      "applicationUrl": "https://localhost:5011;http://localhost:5010",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

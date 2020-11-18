@@ -18,8 +18,10 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Install dependencies
-      run: dotnet restore ./src/AnonymousTokens
-    - name: Build
-      run: dotnet build --configuration Release --no-restore ./src/AnonymousTokens
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal ./src/AnonymousTokens
+      run: dotnet restore ./AnonymousTokens.sln
+    - name: Build client
+      run: dotnet build --configuration Release --no-restore ./src/Client/Client.Console/Client.Console.csproj
+    - name: Build token-generation api
+      run: dotnet build --configuration Release --no-restore ./src/Server/Server.TokenGeneration.Api/Server.TokenGeneration.Api.csproj
+    - name: Build token-verification api
+      run: dotnet build --configuration Release --no-restore ./src/Server/Server.TokenVerification.Api/Server.TokenVerification.Api.csproj     
