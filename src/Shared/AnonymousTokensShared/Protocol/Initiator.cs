@@ -92,7 +92,6 @@ namespace AnonymousTokensShared.Protocol
             {
                 Debug.Fail("Token is invalid.");
                 throw new Exception("Chaum-Pedersen proof invalid.");
-                return 0;
             } 
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
