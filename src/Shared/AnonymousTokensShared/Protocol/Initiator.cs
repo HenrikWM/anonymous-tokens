@@ -85,18 +85,15 @@ namespace AnonymousTokensShared.Protocol
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <param name="r">Masking of the initial point</param>
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
-        public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
+        public ECPoint ArmToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             // Verify the proof (c,z).
-            if (VerifyProof(ecParameters, P, Q, c, z))
+            if (!VerifyProof(ecParameters, P, Q, c, z))
             {
-                Console.WriteLine("Proof is valid.");
-            }
-            else
-            {
-                Console.WriteLine("Proof is not valid.");
                 Debug.Fail("Token is invalid.");
-            }
+                throw new Exception("Chaum-Pedersen proof invalid.");
+                return 0;
+            } 
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
