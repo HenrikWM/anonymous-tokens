@@ -37,13 +37,13 @@ namespace AnonymousTokensShared.Protocol
             BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(curve, random);
 
             // Sample random bytes t such that x = hash(t) is a valid
-            // x-coordinate on the curve. Then T = HashToCurve(t).
+            // x-coordinate on the curve. Then T = HashToWeierstrassCurve(t).
             var t = new byte[32];
             ECPoint T;
             for (; ; )
             {
                 random.NextBytes(t);
-                T = ECCurveHash.HashToCurve(curve, t);
+                T = ECCurveHash.HashToWeierstrassCurve(curve, t);
                 if (T == null)
                     continue;
                 break;
