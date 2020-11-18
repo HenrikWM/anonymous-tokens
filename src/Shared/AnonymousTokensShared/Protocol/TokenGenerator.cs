@@ -42,9 +42,9 @@ namespace AnonymousTokensShared.Protocol
             var Q = P.Multiply(_k);
 
             // Chaum-Pedersen proof of correct signature
-            var proof = CreateProof(ecParameters, P, Q);
+            var (c, z) = CreateProof(ecParameters, P, Q);
 
-            return (Q, proof.c, proof.z);
+            return (Q, c, z);
         }
 
         /// <summary>

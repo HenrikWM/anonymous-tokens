@@ -16,7 +16,7 @@ namespace Server.TokenGeneration.Api.Controllers
     public class TokenController : ControllerBase
     {
         private readonly X9ECParameters _ecParameters;
-        private TokenGenerator _tokenGenerator;
+        private readonly TokenGenerator _tokenGenerator;
 
         public TokenController()
         {

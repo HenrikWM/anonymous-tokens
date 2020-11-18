@@ -14,7 +14,7 @@ namespace AnonymousTokensShared.Protocol
         /// <summary>
         /// Public key for the token scheme.
         /// </summary>
-        private ECPoint _K;
+        private readonly ECPoint _K;
 
         /// <summary>
         /// Creates Initiator with the Public key.

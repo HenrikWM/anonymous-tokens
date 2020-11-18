@@ -16,7 +16,7 @@ namespace Server.TokenVerification.Api.Controllers
     public class TokenController : ControllerBase
     {
         private readonly X9ECParameters _ecParameters;
-        private TokenVerifier _tokenVerifier;
+        private readonly TokenVerifier _tokenVerifier;
 
         public TokenController()
         {

@@ -19,8 +19,8 @@ namespace AnonymousTokensConsole
     {
         private static Initiator _initiator;
 
-        private static TokenGenerationApiClient _tokenGenerationClient = new TokenGenerationApiClient();
-        private static TokenVerificationApiClient _tokenVerificationClient = new TokenVerificationApiClient();
+        private static readonly TokenGenerationApiClient _tokenGenerationClient = new TokenGenerationApiClient();
+        private static readonly TokenVerificationApiClient _tokenVerificationClient = new TokenVerificationApiClient();
 
         static async Task Main(string[] args)
         {
