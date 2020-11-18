@@ -41,6 +41,12 @@ namespace AnonymousTokensShared
                 return null;
 
             ECPoint T = curve.CreatePoint(x.ToBigInteger(), y.ToBigInteger());
+
+            // Multiply the point with the cofactor. If it becomes the identity, we have
+            // been unlucky with our choice of point, and should try again.
+            if T.Multiply(curve.Cofactor).Equals(curve.Infinity)
+                return null;
+
             return T;
         }
     }
