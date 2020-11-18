@@ -28,7 +28,7 @@ namespace AnonymousTokensShared.Protocol
         /// <returns>True if the token is valid, otherwise false</returns>
         public bool VerifyToken(ECCurve curve, byte[] t, ECPoint W)
         {
-            var T = ECCurveHash.HashToCurve(curve, t);
+            var T = ECCurveHash.HashToWeierstrassCurve(curve, t);
             var V = T.Multiply(_k);
             return V.Equals(W);
         }
