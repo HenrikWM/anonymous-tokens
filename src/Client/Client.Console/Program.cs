@@ -4,7 +4,8 @@ using AnonymousTokensConsole.ApiClients.TokenGeneration;
 using AnonymousTokensShared.Protocol;
 using AnonymousTokensShared.Services.InMemory;
 
-using Org.BouncyCastle.Asn1;
+using Client.Console.ApiClients.TokenVerification;
+
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;
 
@@ -16,39 +17,22 @@ namespace AnonymousTokensConsole
 {
     class Program
     {
-        /// <summary>
-        /// Defines an elliptic curve to be used in our protocol.
-        /// </summary>
-        /// <param name="iod">The object identifier for the algorith to use.</param>
-        /// <returns>
-        /// Parameters including curve constants, base point, order and underlying field.
-        /// Built-in functions allow us to compute scalar multiplications and point additions.
-        /// </returns>
-        private static X9ECParameters GetECParameters(DerObjectIdentifier oid)
-        {
-            return CustomNamedCurves.GetByOid(oid);
-        }
-
         private static Initiator _initiator;
-        private static TokenVerifier _tokenVerifier;
 
         private static TokenGenerationApiClient _tokenGenerationClient = new TokenGenerationApiClient();
+        private static TokenVerificationApiClient _tokenVerificationClient = new TokenVerificationApiClient();
 
         static async Task Main(string[] args)
         {
             // TODO: Get BankID JWT and add to HttpClients
 
             // Import parameters for the elliptic curve prime256v1
-            var ecParameters = GetECParameters(X9ObjectIdentifiers.Prime256v1);
+            var ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
             var publicKeyStore = new InMemoryPublicKeyStore();
             var publicKey = publicKeyStore.Get();
 
-            var privateKeyStore = new InMemoryPrivateKeyStore();
-            var privateKey = privateKeyStore.Get();
-
             _initiator = new Initiator(publicKey);
-            _tokenVerifier = new TokenVerifier(privateKey);
 
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(ecParameters.Curve);
@@ -69,7 +53,8 @@ namespace AnonymousTokensConsole
             var W = _initiator.RandomiseToken(ecParameters, P, Q, proofC, proofZ, r);
 
             // 5. Verify that the token (t,W) is correct.
-            if (_tokenVerifier.VerifyToken(ecParameters.Curve, t, W))
+            var isVerified = await _tokenVerificationClient.VerifyTokenAsync(t, W);
+            if (isVerified)
             {
                 Console.WriteLine("Token is valid.");
             }
