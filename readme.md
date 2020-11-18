@@ -1,6 +1,6 @@
 # anonymous-tokens
 
-A C#-implementation of https://github.com/tjesi/anonymous-tokens.
+A C#-implementation of <https://github.com/tjesi/anonymous-tokens>.
 
 ## Scope
 
@@ -24,17 +24,17 @@ This Proof-of-Concept contains:
 - In Visual Studio right-click on the solution **AnonymousTokens** in the Solution Explorer window and choose **Set startup projects...**
 - Select **Multiple startup projects** and set **Action** to **Start** on projects:
   - Client.Console
-  - Server.Backend
-  - Server.VerificationBackend
+  - Server.TokenGeneration.Api
+  - Server.TokenVerification.Api
 - Build & run using F5 in Visual Studio
 
 ### Build & run with a terminal
 
 - In the root of the cloned repo open 3 terminal windows.
 - Run each in a separate terminal:
-  - `dotnet run --project .\src\Client\Client.Console\Client.Console.csproj`
-  - `dotnet run --project .\src\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj`
-  - `dotnet run --project .\src\Server\Server.TokenVerification.Api\Server.TokenVerification.Api.csproj`
+  - `dotnet run --project .\samples\ClientServer\Client\Client.Console\Client.Console.csproj`
+  - `dotnet run --project .\samples\ClientServer\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj`
+  - `dotnet run --project .\samples\ClientServer\Server\Server.TokenVerification.Api\Server.TokenVerification.Api.csproj`
 
 ## Roadmap
 
