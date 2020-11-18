@@ -11,6 +11,9 @@ end_of_line = lf
 [*.{csproj,json,config,yml,props}]
 indent_size = 2
 
+[*.md]
+indent_size = 2
+
 [*.sh]
 end_of_line = lf
 
