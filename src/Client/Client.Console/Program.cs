@@ -24,8 +24,6 @@ namespace AnonymousTokensConsole
 
         static async Task Main(string[] args)
         {
-            // TODO: Get BankID JWT and add to HttpClients
-
             // Import parameters for the elliptic curve prime256v1
             var ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
@@ -43,7 +41,7 @@ namespace AnonymousTokensConsole
             // 2. Generate token Q = k*P and proof (c,z) of correctness
             var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
 
-            // 3. Verify proof (ingen hemmelig info) - kan flyttes til et bevis-API. Brukt av både TokenGenerator og Initiator(appen)
+            // 3. Verify proof (ingen hemmelig info)
             if (_initiator.VerifyProof(ecParameters, P, Q, proofC, proofZ) == false)
             {
                 throw new Exception("Unable to verify proof.");
