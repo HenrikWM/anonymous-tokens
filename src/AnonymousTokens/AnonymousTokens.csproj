@@ -1,7 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Henrik Walker Moe, Martin Strand, Tjerand Silde</Authors>
+    <Description>Privacy Pass and anonymous tokens implementation in .NET</Description>
+    <Copyright>Copyright Henrik Walker Moe, Martin Strand, Tjerand Silde</Copyright>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <Features>strict</Features>
+    <PackageTags>privacy-pass;anonymous-tokens</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
