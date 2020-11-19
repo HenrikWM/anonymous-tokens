@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
@@ -90,7 +90,7 @@ namespace AnonymousTokensShared.Protocol
             var curve = ecParameters.Curve;
 
             // Check that Q is a valid point on the currect curve
-            if(Q == null || !curve.Equals(Q.Curve) || Q.Multiply(curve.Cofactor).Equals(curve.Infinity))
+            if (ECPointVerifier.PointIsValidOnCurve(Q, curve) == false)
                 return null;
 
             // Verify the proof (c,z).
@@ -98,7 +98,7 @@ namespace AnonymousTokensShared.Protocol
             {
                 Debug.Fail("Token is invalid.");
                 throw new Exception("Chaum-Pedersen proof invalid.");
-            } 
+            }
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
