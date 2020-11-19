@@ -7,7 +7,7 @@ using Org.BouncyCastle.Security;
 using System;
 using System.Diagnostics;
 
-namespace AnonymousTokensShared.Protocol
+namespace AnonymousTokens.Protocol
 {
     public class Initiator
     {
@@ -19,7 +19,7 @@ namespace AnonymousTokensShared.Protocol
         /// <summary>
         /// Creates Initiator with the Public key.
         /// </summary>
-        /// <param name="publicKeyParameters">Parameters containing the public key K.</param>        
+        /// <param name="publicKeyParameters">Parameters containing the public key K.</param>
         public Initiator(ECPublicKeyParameters publicKeyParameters)
         {
             _K = publicKeyParameters.Q;
@@ -92,7 +92,7 @@ namespace AnonymousTokensShared.Protocol
             {
                 Debug.Fail("Token is invalid.");
                 throw new Exception("Chaum-Pedersen proof invalid.");
-            } 
+            }
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);

@@ -1,7 +1,7 @@
 ﻿using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
-namespace AnonymousTokensShared.Protocol
+namespace AnonymousTokens.Protocol
 {
     public class TokenVerifier
     {
@@ -12,7 +12,7 @@ namespace AnonymousTokensShared.Protocol
 
         /// <summary>
         /// Creates an instance of TokenGenerator with a key pair.
-        /// </summary>        
+        /// </summary>
         /// <param name="k">The private key.</param>
         public TokenVerifier(BigInteger k)
         {
@@ -24,7 +24,7 @@ namespace AnonymousTokensShared.Protocol
         /// </summary>
         /// <param name="curve">Curve parameters</param>
         /// <param name="t">Seed for the initial point chosen by the initiator</param>
-        /// <param name="W">Token received from the initiator</param>        
+        /// <param name="W">Token received from the initiator</param>
         /// <returns>True if the token is valid, otherwise false</returns>
         public bool VerifyToken(ECCurve curve, byte[] t, ECPoint W)
         {

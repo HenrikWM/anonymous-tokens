@@ -1,6 +1,6 @@
 ﻿using Org.BouncyCastle.Crypto.Parameters;
 
-namespace AnonymousTokensShared.Services
+namespace AnonymousTokens.Services
 {
     public interface IPublicKeyStore
     {

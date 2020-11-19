@@ -18,8 +18,8 @@ jobs:
           dotnet-version: 3.1.301
       - name: Install dependencies
         run: dotnet restore ./AnonymousTokens.sln
-      - name: Build AnonymousTokensShared
-        run: dotnet build --configuration Release --no-restore ./src/AnonymousTokensShared/AnonymousTokensShared.csproj
+      - name: Build AnonymousTokens
+        run: dotnet build --configuration Release --no-restore ./src/AnonymousTokens/AnonymousTokens.csproj
       - name: Build ClientServer-sample client
         run: dotnet build --configuration Release --no-restore ./samples/ClientServer/Client/Client.Console/Client.Console.csproj
       - name: Build ClientServer-sample token-generation api
@@ -27,4 +27,4 @@ jobs:
       - name: Build ClientServer-sample token-verification api
         run: dotnet build --configuration Release --no-restore ./samples/ClientServer/Server/Server.TokenVerification.Api/Server.TokenVerification.Api.csproj
       - name: Run UnitTests
-        run: dotnet test --configuration Release --no-restore ./test/AnonymousTokensShared.UnitTests/AnonymousTokensShared.UnitTests.csproj
+        run: dotnet test --configuration Release --no-restore ./test/AnonymousTokens.UnitTests/AnonymousTokens.UnitTests.csproj

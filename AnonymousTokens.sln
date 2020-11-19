@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server-side", "Server-side"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4DDE2573-8947-4348-95B4-688102A8294D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokensShared", "src\AnonymousTokensShared\AnonymousTokensShared.csproj", "{D98EB88A-9922-4AA5-8C97-6206C7196CD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens", "src\AnonymousTokens\AnonymousTokens.csproj", "{D98EB88A-9922-4AA5-8C97-6206C7196CD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.TokenGeneration.Api", "samples\ClientServer\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj", "{E691A98B-3EBC-4AE7-8858-67601E805909}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.TokenVerification.Ap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4FB09123-E5E6-4367-BEDD-FF3D9906A2BA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokensShared.UnitTests", "test\AnonymousTokensShared.UnitTests\AnonymousTokensShared.UnitTests.csproj", "{E24CF8EE-6D9B-49AC-92A5-EB1F81FDAAA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.UnitTests", "test\AnonymousTokens.UnitTests\AnonymousTokens.UnitTests.csproj", "{E24CF8EE-6D9B-49AC-92A5-EB1F81FDAAA2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{645EAD64-C3E7-41AA-B7E4-E423DFFCEEDF}"
 EndProject
