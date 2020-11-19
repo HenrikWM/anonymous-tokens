@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Authors>Henrik Walker Moe, Martin Strand, Tjerand Silde</Authors>
+    <Authors>Henrik Walker Moe, Tjerand Silde, Martin Strand</Authors>
     <Description>Anonymous tokens implementation in .NET based on Privacy Pass</Description>
-    <Copyright>Copyright Henrik Walker Moe, Martin Strand, Tjerand Silde</Copyright>
+    <Copyright>Copyright Henrik Walker Moe, Tjerand Silde, Martin Strand</Copyright>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
