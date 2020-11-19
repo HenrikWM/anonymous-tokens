@@ -85,7 +85,7 @@ namespace AnonymousTokensShared.Protocol
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <param name="r">Masking of the initial point</param>
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
-        public ECPoint ArmToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
+        public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             // Verify the proof (c,z).
             if (!VerifyProof(ecParameters, P, Q, c, z))
