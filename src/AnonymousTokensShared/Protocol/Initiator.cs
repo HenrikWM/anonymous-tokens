@@ -87,6 +87,12 @@ namespace AnonymousTokensShared.Protocol
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
         public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
+            var curve = ecParameters.Curve;
+
+            // Check that Q is a valid point on the currect curve
+            if(Q == null || !curve.Equals(Q.Curve) || Q.Multiply(curve.Cofactor).Equals(curve.Infinity))
+                return null;
+
             // Verify the proof (c,z).
             if (!VerifyProof(ecParameters, P, Q, c, z))
             {

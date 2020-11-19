@@ -38,6 +38,12 @@ namespace AnonymousTokensShared.Protocol
         /// <returns>A signed point Q and a Chaum-Pedersen proof (c,z) proving that the point is signed correctly</returns>
         public (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P)
         {
+            var curve = ecParameters.Curve;
+
+            // Check that P is a valid point on the currect curve
+            if (P == null || !curve.Equals(P.Curve) || P.Multiply(curve.Cofactor).Equals(curve.Infinity))
+                return (null, BigInteger.Zero, BigInteger.Zero);
+            
             // Compute Q = k*P
             var Q = P.Multiply(_k);
 

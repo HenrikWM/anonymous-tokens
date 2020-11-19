@@ -20,7 +20,8 @@ namespace AnonymousTokensShared.Protocol
         }
 
         /// <summary>
-        /// Used by the token verifier. It recreates the initial point from the initiator, signs it, and verifies that they are equal.
+        /// Used by the token verifier. It recreates the initial point from the
+        /// initiator, signs it, and verifies that they are equal.
         /// </summary>
         /// <param name="curve">Curve parameters</param>
         /// <param name="t">Seed for the initial point chosen by the initiator</param>
@@ -28,7 +29,15 @@ namespace AnonymousTokensShared.Protocol
         /// <returns>True if the token is valid, otherwise false</returns>
         public bool VerifyToken(ECCurve curve, byte[] t, ECPoint W)
         {
+            // TODO
+            // Check if tokem t is received earlier
+            // if ( "t in tokenList" ) { return false; }
+
             var T = ECCurveHash.HashToWeierstrassCurve(curve, t);
+
+            // Check that T and W are valid points
+            if (T == null || W == null) { return false; }
+
             var V = T.Multiply(_k);
             return V.Equals(W);
         }
