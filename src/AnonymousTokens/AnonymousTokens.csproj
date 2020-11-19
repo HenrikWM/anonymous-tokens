@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Authors>Henrik Walker Moe, Martin Strand, Tjerand Silde</Authors>
-    <Description>Privacy Pass and anonymous tokens implementation in .NET</Description>
+    <Description>Anonymous tokens implementation in .NET based on Privacy Pass</Description>
     <Copyright>Copyright Henrik Walker Moe, Martin Strand, Tjerand Silde</Copyright>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
