@@ -16,7 +16,7 @@ namespace AnonymousTokensShared
         /// <param name="curve">The elliptic curve in Weierstrass form</param>
         /// <param name="t">The seed</param>
         /// <returns>A random point T uniquely determined by seed t, otherwise null</returns>
-        public static ECPoint HashToCurve(ECCurve curve, byte[] t)
+        public static ECPoint HashToWeierstrassCurve(ECCurve curve, byte[] t)
         {
             ECFieldElement x, ax, x3, y, y2;
 
@@ -41,6 +41,12 @@ namespace AnonymousTokensShared
                 return null;
 
             ECPoint T = curve.CreatePoint(x.ToBigInteger(), y.ToBigInteger());
+
+            // Multiply the point with the cofactor. If it becomes the identity, we have
+            // been unlucky with our choice of point, and should try again.
+            if (T.Multiply(curve.Cofactor).Equals(curve.Infinity))
+                return null;
+
             return T;
         }
     }
