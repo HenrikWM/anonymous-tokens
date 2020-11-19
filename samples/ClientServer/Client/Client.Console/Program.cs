@@ -41,16 +41,10 @@ namespace AnonymousTokensConsole
             // 2. Generate token Q = k*P and proof (c,z) of correctness
             var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
 
-            // 3. Verify proof
-            if (_initiator.VerifyProof(ecParameters, P, Q, proofC, proofZ) == false)
-            {
-                throw new Exception("Unable to verify proof.");
-            }
-
-            // 4. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
+            // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
             var W = _initiator.RandomiseToken(ecParameters, P, Q, proofC, proofZ, r);
 
-            // 5. Verify that the token (t,W) is correct.
+            // 4. Verify that the token (t,W) is correct.
             var isVerified = await _tokenVerificationClient.VerifyTokenAsync(t, W);
             if (isVerified)
             {

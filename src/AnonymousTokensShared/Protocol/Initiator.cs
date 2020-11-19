@@ -37,13 +37,13 @@ namespace AnonymousTokensShared.Protocol
             BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(curve, random);
 
             // Sample random bytes t such that x = hash(t) is a valid
-            // x-coordinate on the curve. Then T = HashToCurve(t).
+            // x-coordinate on the curve. Then T = HashToWeierstrassCurve(t).
             var t = new byte[32];
             ECPoint T;
             for (; ; )
             {
                 random.NextBytes(t);
-                T = ECCurveHash.HashToCurve(curve, t);
+                T = ECCurveHash.HashToWeierstrassCurve(curve, t);
                 if (T == null)
                     continue;
                 break;
@@ -88,15 +88,11 @@ namespace AnonymousTokensShared.Protocol
         public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             // Verify the proof (c,z).
-            if (VerifyProof(ecParameters, P, Q, c, z))
+            if (!VerifyProof(ecParameters, P, Q, c, z))
             {
-                Console.WriteLine("Proof is valid.");
-            }
-            else
-            {
-                Console.WriteLine("Proof is not valid.");
                 Debug.Fail("Token is invalid.");
-            }
+                throw new Exception("Chaum-Pedersen proof invalid.");
+            } 
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
