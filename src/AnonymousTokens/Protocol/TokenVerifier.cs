@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
 namespace AnonymousTokens.Protocol
@@ -29,6 +29,9 @@ namespace AnonymousTokens.Protocol
         public bool VerifyToken(ECCurve curve, byte[] t, ECPoint W)
         {
             var T = ECCurveHash.HashToWeierstrassCurve(curve, t);
+            if (T == null)
+                return false;
+
             var V = T.Multiply(_k);
             return V.Equals(W);
         }
