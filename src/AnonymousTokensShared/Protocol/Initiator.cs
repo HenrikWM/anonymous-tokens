@@ -1,11 +1,10 @@
-﻿using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
-using System.Diagnostics;
 
 namespace AnonymousTokensShared.Protocol
 {
@@ -87,12 +86,17 @@ namespace AnonymousTokensShared.Protocol
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
         public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
+            var curve = ecParameters.Curve;
+
+            // Check that Q is a valid point on the currect curve
+            if (ECPointVerifier.PointIsValid(Q, curve) == false)
+                throw new Exception("Q is not a valid point on the curve");
+
             // Verify the proof (c,z).
             if (!VerifyProof(ecParameters, P, Q, c, z))
             {
-                Debug.Fail("Token is invalid.");
                 throw new Exception("Chaum-Pedersen proof invalid.");
-            } 
+            }
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);

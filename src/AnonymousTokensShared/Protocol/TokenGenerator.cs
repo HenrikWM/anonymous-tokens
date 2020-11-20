@@ -1,7 +1,9 @@
-﻿using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
+
+using System;
 
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
@@ -38,6 +40,12 @@ namespace AnonymousTokensShared.Protocol
         /// <returns>A signed point Q and a Chaum-Pedersen proof (c,z) proving that the point is signed correctly</returns>
         public (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P)
         {
+            var curve = ecParameters.Curve;
+
+            // Check that P is a valid point on the currect curve
+            if (ECPointVerifier.PointIsValid(P, curve) == false)
+                throw new Exception("P is not a valid point on the curve");
+
             // Compute Q = k*P
             var Q = P.Multiply(_k);
 
