@@ -5,7 +5,6 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
 using System;
-using System.Diagnostics;
 
 namespace AnonymousTokensShared.Protocol
 {
@@ -96,7 +95,6 @@ namespace AnonymousTokensShared.Protocol
             // Verify the proof (c,z).
             if (!VerifyProof(ecParameters, P, Q, c, z))
             {
-                Debug.Fail("Token is invalid.");
                 throw new Exception("Chaum-Pedersen proof invalid.");
             }
 
