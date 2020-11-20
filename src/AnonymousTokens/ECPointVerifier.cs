@@ -1,6 +1,6 @@
 using Org.BouncyCastle.Math.EC;
 
-namespace AnonymousTokensShared
+namespace AnonymousTokens
 {
     public static class ECPointVerifier
     {

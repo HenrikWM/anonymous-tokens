@@ -1,4 +1,4 @@
-using AnonymousTokensShared.Services;
+using AnonymousTokens.Services;
 
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
@@ -15,7 +15,7 @@ namespace AnonymousTokens.Protocol
 
         /// <summary>
         /// Creates an instance of TokenGenerator with the private key and a store for t.
-        /// </summary>        
+        /// </summary>
         /// <param name="k">The private key.</param>
         /// <param name="seedStore">The storage for t.</param>
         public TokenVerifier(BigInteger k, ISeedStore seedStore)
