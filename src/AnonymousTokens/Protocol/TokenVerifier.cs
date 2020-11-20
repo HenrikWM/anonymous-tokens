@@ -1,9 +1,9 @@
-using AnonymousTokensShared.Services;
+using AnonymousTokens.Services;
 
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
-namespace AnonymousTokensShared.Protocol
+namespace AnonymousTokens.Protocol
 {
     public class TokenVerifier
     {
@@ -15,7 +15,7 @@ namespace AnonymousTokensShared.Protocol
 
         /// <summary>
         /// Creates an instance of TokenGenerator with the private key and a store for t.
-        /// </summary>        
+        /// </summary>
         /// <param name="k">The private key.</param>
         /// <param name="seedStore">The storage for t.</param>
         public TokenVerifier(BigInteger k, ISeedStore seedStore)
@@ -25,12 +25,11 @@ namespace AnonymousTokensShared.Protocol
         }
 
         /// <summary>
-        /// Used by the token verifier. It recreates the initial point from the
-        /// initiator, signs it, and verifies that they are equal.
+        /// Used by the token verifier. It recreates the initial point from the initiator, signs it, and verifies that they are equal.
         /// </summary>
         /// <param name="curve">Curve parameters</param>
         /// <param name="t">Seed for the initial point chosen by the initiator</param>
-        /// <param name="W">Token received from the initiator</param>        
+        /// <param name="W">Token received from the initiator</param>
         /// <returns>True if the token is valid, otherwise false</returns>
         public bool VerifyToken(ECCurve curve, byte[] t, ECPoint W)
         {
@@ -41,9 +40,8 @@ namespace AnonymousTokensShared.Protocol
             _seedStore.Save(t);
 
             var T = ECCurveHash.HashToWeierstrassCurve(curve, t);
-
-            // Check that T and W are valid points
-            if (T == null || W == null) { return false; }
+            if (T == null)
+                return false;
 
             var V = T.Multiply(_k);
             return V.Equals(W);

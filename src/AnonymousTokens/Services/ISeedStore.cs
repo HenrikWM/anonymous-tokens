@@ -1,4 +1,4 @@
-namespace AnonymousTokensShared.Services
+namespace AnonymousTokens.Services
 {
     public interface ISeedStore
     {

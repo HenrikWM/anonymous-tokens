@@ -6,7 +6,7 @@ using Org.BouncyCastle.Security;
 
 using System;
 
-namespace AnonymousTokensShared.Protocol
+namespace AnonymousTokens.Protocol
 {
     public class Initiator
     {
@@ -18,7 +18,7 @@ namespace AnonymousTokensShared.Protocol
         /// <summary>
         /// Creates Initiator with the Public key.
         /// </summary>
-        /// <param name="publicKeyParameters">Parameters containing the public key K.</param>        
+        /// <param name="publicKeyParameters">Parameters containing the public key K.</param>
         public Initiator(ECPublicKeyParameters publicKeyParameters)
         {
             _K = publicKeyParameters.Q;
@@ -38,7 +38,7 @@ namespace AnonymousTokensShared.Protocol
             // Sample random bytes t such that x = hash(t) is a valid
             // x-coordinate on the curve. Then T = HashToWeierstrassCurve(t).
             var t = new byte[32];
-            ECPoint T;
+            ECPoint? T;
             for (; ; )
             {
                 random.NextBytes(t);

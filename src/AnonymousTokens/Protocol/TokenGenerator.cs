@@ -7,7 +7,7 @@ using System;
 
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
-namespace AnonymousTokensShared.Protocol
+namespace AnonymousTokens.Protocol
 {
     public class TokenGenerator
     {
@@ -59,7 +59,7 @@ namespace AnonymousTokensShared.Protocol
         /// Used by the token service. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
         /// The Chaum-Pedersen proof proves that the same secret key k is used to compute K = k*G and Q = k*P, without revealing k.
         /// </summary>
-        /// <param name="ecParameters">Curve parameters</param>        
+        /// <param name="ecParameters">Curve parameters</param>
         /// <param name="P">Point submitted by the initiator</param>
         /// <param name="Q">Point signed using the secret key</param>
         /// <returns></returns>

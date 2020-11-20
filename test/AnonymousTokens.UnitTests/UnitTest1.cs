@@ -2,7 +2,7 @@ using System;
 
 using Xunit;
 
-namespace AnonymousTokensShared.UnitTests
+namespace AnonymousTokens.UnitTests
 {
     public class UnitTest1
     {

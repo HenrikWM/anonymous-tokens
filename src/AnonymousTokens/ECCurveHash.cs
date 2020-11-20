@@ -1,4 +1,4 @@
-﻿using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
 using System.Security.Cryptography;
@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using ECCurve = Org.BouncyCastle.Math.EC.ECCurve;
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
-namespace AnonymousTokensShared
+namespace AnonymousTokens
 {
     public static class ECCurveHash
     {
@@ -16,7 +16,7 @@ namespace AnonymousTokensShared
         /// <param name="curve">The elliptic curve in Weierstrass form</param>
         /// <param name="t">The seed</param>
         /// <returns>A random point T uniquely determined by seed t, otherwise null</returns>
-        public static ECPoint HashToWeierstrassCurve(ECCurve curve, byte[] t)
+        public static ECPoint? HashToWeierstrassCurve(ECCurve curve, byte[] t)
         {
             ECFieldElement x, ax, x3, y, y2;
 
