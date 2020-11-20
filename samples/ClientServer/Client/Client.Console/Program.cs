@@ -1,4 +1,4 @@
-﻿
+
 using AnonymousTokensConsole.ApiClients.TokenGeneration;
 
 using AnonymousTokens.Protocol;
