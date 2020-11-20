@@ -1,4 +1,7 @@
 
+using AnonymousTokensShared.Services;
+using AnonymousTokensShared.Services.InMemory;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +16,8 @@ namespace Server.VerificationBackend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSingleton<ISeedStore, InMemorySeedStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

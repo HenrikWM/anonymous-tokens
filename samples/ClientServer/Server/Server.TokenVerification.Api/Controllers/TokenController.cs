@@ -1,4 +1,5 @@
-﻿using AnonymousTokensShared.Protocol;
+using AnonymousTokensShared.Protocol;
+using AnonymousTokensShared.Services;
 using AnonymousTokensShared.Services.InMemory;
 
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +19,14 @@ namespace Server.TokenVerification.Api.Controllers
         private readonly X9ECParameters _ecParameters;
         private readonly TokenVerifier _tokenVerifier;
 
-        public TokenController()
+        public TokenController(ISeedStore seedStore)
         {
             _ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
             var privateKeyStore = new InMemoryPrivateKeyStore();
             var privateKey = privateKeyStore.Get();
 
-            _tokenVerifier = new TokenVerifier(privateKey);
+            _tokenVerifier = new TokenVerifier(privateKey, seedStore);
         }
 
         [Route("verify")]
