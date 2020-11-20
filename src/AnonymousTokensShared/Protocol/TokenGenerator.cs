@@ -3,6 +3,8 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 
+using System;
+
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
 namespace AnonymousTokensShared.Protocol
@@ -41,8 +43,8 @@ namespace AnonymousTokensShared.Protocol
             var curve = ecParameters.Curve;
 
             // Check that P is a valid point on the currect curve
-            if (ECPointVerifier.PointIsValidOnCurve(P, curve) == false)
-                return (null, BigInteger.Zero, BigInteger.Zero);
+            if (ECPointVerifier.PointIsValid(P, curve) == false)
+                throw new Exception("P is not a valid point on the curve");
 
             // Compute Q = k*P
             var Q = P.Multiply(_k);
