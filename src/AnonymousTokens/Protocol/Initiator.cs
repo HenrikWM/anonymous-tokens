@@ -29,13 +29,13 @@ namespace AnonymousTokens.Protocol
         /// <returns>The seed t for a random point, the initial mask r of the point, and the masked point P</returns>
         public (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
-            var random = new SecureRandom();
+            SecureRandom? random = new SecureRandom();
 
             BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(curve, random);
 
             // Sample random bytes t such that x = hash(t) is a valid
             // x-coordinate on the curve. Then T = HashToWeierstrassCurve(t).
-            var t = new byte[32];
+            byte[]? t = new byte[32];
             ECPoint? T;
             for (; ; )
             {
@@ -66,10 +66,10 @@ namespace AnonymousTokens.Protocol
         public bool VerifyProof(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
         {
             // Compute X = z*G + c*K = r*G
-            var X = ecParameters.G.Multiply(z).Add(_K.Multiply(c));
+            ECPoint? X = ecParameters.G.Multiply(z).Add(_K.Multiply(c));
 
             // Compute Y = z*P + c*Q = r*P
-            var Y = P.Multiply(z).Add(Q.Multiply(c));
+            ECPoint? Y = P.Multiply(z).Add(Q.Multiply(c));
 
             // Returns true if the challenge from the proof equals the new challenge
             return c.Equals(CPChallengeGenerator.CreateChallenge(ecParameters.G, P, _K, Q, X, Y));
@@ -87,7 +87,7 @@ namespace AnonymousTokens.Protocol
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
         public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
-            var curve = ecParameters.Curve;
+            ECCurve? curve = ecParameters.Curve;
 
             // Check that P is a valid point on the currect curve
             if (ECPointVerifier.PointIsValid(P, curve) == false)
@@ -102,8 +102,8 @@ namespace AnonymousTokens.Protocol
                 throw new AnonymousTokensException("Chaum-Pedersen proof is invalid");
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
-            var rInverse = r.ModInverse(ecParameters.Curve.Order);
-            var W = Q.Multiply(rInverse);
+            BigInteger? rInverse = r.ModInverse(ecParameters.Curve.Order);
+            ECPoint? W = Q.Multiply(rInverse);
             return W;
         }
     }

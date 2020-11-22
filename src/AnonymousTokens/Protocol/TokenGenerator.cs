@@ -38,17 +38,17 @@ namespace AnonymousTokens.Protocol
         /// <returns>A signed point Q and a Chaum-Pedersen proof (c,z) proving that the point is signed correctly</returns>
         public (ECPoint Q, BigInteger c, BigInteger z) GenerateToken(X9ECParameters ecParameters, ECPoint P)
         {
-            var curve = ecParameters.Curve;
+            Org.BouncyCastle.Math.EC.ECCurve? curve = ecParameters.Curve;
 
             // Check that P is a valid point on the currect curve
             if (ECPointVerifier.PointIsValid(P, curve) == false)
                 throw new AnonymousTokensException("P is not a valid point on the curve");
 
             // Compute Q = k*P
-            var Q = P.Multiply(_k);
+            ECPoint? Q = P.Multiply(_k);
 
             // Chaum-Pedersen proof of correct signature
-            var (c, z) = CreateProof(ecParameters, P, Q);
+            (BigInteger c, BigInteger z) = CreateProof(ecParameters, P, Q);
 
             return (Q, c, z);
         }
@@ -63,7 +63,7 @@ namespace AnonymousTokens.Protocol
         /// <returns></returns>
         private (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, ECPoint P, ECPoint Q)
         {
-            var random = new SecureRandom();
+            SecureRandom? random = new SecureRandom();
 
             // Sample a random integer 0 < r < N
             BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(ecParameters.Curve, random);
