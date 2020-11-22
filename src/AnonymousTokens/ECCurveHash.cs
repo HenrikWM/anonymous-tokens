@@ -20,17 +20,17 @@ namespace AnonymousTokens
         {
             ECFieldElement x, ax, x3, y, y2;
 
-            var P = curve.Field.Characteristic;
-            var sha256 = SHA256.Create();
-            var hashAsInt = new BigInteger(sha256.ComputeHash(t));
+            BigInteger P = curve.Field.Characteristic;
+            SHA256? sha256 = SHA256.Create();
+            BigInteger hash = new BigInteger(sha256.ComputeHash(t));
 
             // Check that the hash is within valid range
-            if (hashAsInt.CompareTo(BigInteger.One) < 0 || hashAsInt.CompareTo(P) >= 0)
+            if (hash.CompareTo(BigInteger.One) < 0 || hash.CompareTo(P) >= 0)
                 return null;
 
             // A valid point (x,y) must satisfy: y^2 = x^3 + Ax + B mod P
             // Convert hash from BigInt to FieldElement x modulo P
-            x = curve.FromBigInteger(hashAsInt);    // x
+            x = curve.FromBigInteger(hash);         // x
             ax = x.Multiply(curve.A);               // Ax
             x3 = x.Multiply(x).Multiply(x);         // x^3
             y2 = x3.Add(ax).Add(curve.B);           // y^2 = x^3 + Ax + B
