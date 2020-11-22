@@ -32,7 +32,7 @@ namespace AnonymousTokens
             // Convert hash from BigInt to FieldElement x modulo P
             x = curve.FromBigInteger(hashAsInt);    // x
             ax = x.Multiply(curve.A);               // Ax
-            x3 = x.Multiply(x).Multiply(x);         // x^3
+            x3 = x.Square().Multiply(x);            // x^3 = x^2 * x
             y2 = x3.Add(ax).Add(curve.B);           // y^2 = x^3 + Ax + B
             y = y2.Sqrt();                          // y = sqrt(x^3 + Ax + B)
 
@@ -42,9 +42,9 @@ namespace AnonymousTokens
 
             ECPoint T = curve.CreatePoint(x.ToBigInteger(), y.ToBigInteger());
 
-            // Multiply the point with the cofactor. If it becomes the identity, we have
-            // been unlucky with our choice of point, and should try again.
-            if (T.Multiply(curve.Cofactor).Equals(curve.Infinity))
+            // Use the built-in point validator, which also checks for membership
+            // in weak subgroups
+            if (!T.IsValid())
                 return null;
 
             return T;
