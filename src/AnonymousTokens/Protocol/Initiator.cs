@@ -88,6 +88,10 @@ namespace AnonymousTokens.Protocol
         {
             var curve = ecParameters.Curve;
 
+            // Check that P is a valid point on the currect curve
+            if (ECPointVerifier.PointIsValid(P, curve) == false)
+                throw new Exception("P is not a valid point on the curve");
+
             // Check that Q is a valid point on the currect curve
             if (ECPointVerifier.PointIsValid(Q, curve) == false)
                 throw new Exception("Q is not a valid point on the curve");
