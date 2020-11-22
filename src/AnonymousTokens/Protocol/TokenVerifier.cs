@@ -43,11 +43,11 @@ namespace AnonymousTokens.Protocol
 
             _seedStore.Save(t);
 
-            var T = ECCurveHash.HashToWeierstrassCurve(curve, t);
+            ECPoint? T = ECCurveHash.HashToWeierstrassCurve(curve, t);
             if (T == null)
                 return false;
 
-            var V = T.Multiply(_k);
+            ECPoint? V = T.Multiply(_k);
             return V.Equals(W);
         }
     }
