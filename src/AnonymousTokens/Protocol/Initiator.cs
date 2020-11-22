@@ -48,6 +48,9 @@ namespace AnonymousTokens.Protocol
                 break;
             }
 
+            if (T == null)
+                throw new AnonymousTokensException("Point T is null after unsuccessfull hashing");
+
             // Compute P = r*T
             ECPoint P = T.Multiply(r);
             return (t, r, P);
