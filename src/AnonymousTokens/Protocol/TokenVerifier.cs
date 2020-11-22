@@ -3,8 +3,6 @@ using AnonymousTokens.Services;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
-using System;
-
 namespace AnonymousTokens.Protocol
 {
     public class TokenVerifier
@@ -41,7 +39,7 @@ namespace AnonymousTokens.Protocol
 
             // Check that W is a valid point on the currect curve
             if (ECPointVerifier.PointIsValid(W, curve) == false)
-                throw new Exception("W is not a valid point on the curve");
+                throw new AnonymousTokensException("W is not a valid point on the curve");
 
             _seedStore.Save(t);
 

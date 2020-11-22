@@ -4,8 +4,6 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
-using System;
-
 namespace AnonymousTokens.Protocol
 {
     public class Initiator
@@ -93,17 +91,15 @@ namespace AnonymousTokens.Protocol
 
             // Check that P is a valid point on the currect curve
             if (ECPointVerifier.PointIsValid(P, curve) == false)
-                throw new Exception("P is not a valid point on the curve");
+                throw new AnonymousTokensException("P is not a valid point on the curve");
 
             // Check that Q is a valid point on the currect curve
             if (ECPointVerifier.PointIsValid(Q, curve) == false)
-                throw new Exception("Q is not a valid point on the curve");
+                throw new AnonymousTokensException("Q is not a valid point on the curve");
 
             // Verify the proof (c,z).
             if (!VerifyProof(ecParameters, P, Q, c, z))
-            {
-                throw new Exception("Chaum-Pedersen proof invalid.");
-            }
+                throw new AnonymousTokensException("Chaum-Pedersen proof is invalid");
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.
             var rInverse = r.ModInverse(ecParameters.Curve.Order);
