@@ -1,8 +1,8 @@
-﻿
+
 using System.IO;
 using System.Reflection;
 
-namespace AnonymousTokens.Services.InMemory
+namespace AnonymousTokens.Shared.Services.InMemory
 {
     public static class EmbeddedPemResource
     {

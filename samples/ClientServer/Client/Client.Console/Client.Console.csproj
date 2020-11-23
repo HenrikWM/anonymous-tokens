@@ -10,7 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\AnonymousTokens\AnonymousTokens.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AnonymousTokens.Client\AnonymousTokens.Client.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AnonymousTokens.Shared\AnonymousTokens.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
-﻿using AnonymousTokens.Protocol;
-using AnonymousTokens.Services.InMemory;
+using AnonymousTokens.Server.Protocol;
+using AnonymousTokens.Shared.Services.InMemory;
 
 using Microsoft.AspNetCore.Mvc;
 

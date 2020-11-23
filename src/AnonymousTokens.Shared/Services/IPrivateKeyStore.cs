@@ -1,6 +1,6 @@
-﻿using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math;
 
-namespace AnonymousTokens.Services
+namespace AnonymousTokens.Shared.Services
 {
     public interface IPrivateKeyStore
     {

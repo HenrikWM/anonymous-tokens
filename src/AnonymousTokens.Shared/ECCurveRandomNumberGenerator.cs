@@ -1,8 +1,8 @@
-﻿using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
-namespace AnonymousTokens
+namespace AnonymousTokens.Shared
 {
     public static class ECCurveRandomNumberGenerator
     {

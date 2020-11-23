@@ -2,7 +2,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 
-namespace AnonymousTokens.Services.InMemory
+namespace AnonymousTokens.Shared.Services.InMemory
 {
     public class InMemoryPrivateKeyStore : IPrivateKeyStore
     {

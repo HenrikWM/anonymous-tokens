@@ -1,18 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project>
   <PropertyGroup>
     <Authors>Henrik Walker Moe, Tjerand Silde, Martin Strand</Authors>
     <Description>Anonymous tokens implementation in .NET based on Privacy Pass</Description>
     <Copyright>Copyright Henrik Walker Moe, Tjerand Silde, Martin Strand</Copyright>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
     <Features>strict</Features>
+    <Nullable>enable</Nullable>
     <PackageTags>privacy-pass;anonymous-tokens</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <IsPackable>True</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -21,23 +21,8 @@
     <Version>0.1.0</Version>
     <RepositoryUrl>https://github.com/HenrikWM/anonymous-tokens</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1701;CS1702;CS1591;CS1570</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Services\InMemory\private-key.pem" />
-    <None Remove="Services\InMemory\public-key.pem" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Services\InMemory\private-key.pem" />
-    <EmbeddedResource Include="Services\InMemory\public-key.pem" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

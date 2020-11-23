@@ -1,9 +1,10 @@
-using AnonymousTokens.Services;
+using AnonymousTokens.Shared;
+using AnonymousTokens.Shared.Services;
 
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
-namespace AnonymousTokens.Protocol
+namespace AnonymousTokens.Server.Protocol
 {
     public class TokenVerifier
     {

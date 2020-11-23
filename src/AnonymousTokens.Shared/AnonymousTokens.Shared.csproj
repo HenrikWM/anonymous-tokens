@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <AssemblyName>AnonymousTokens.Shared</AssemblyName>
+    <RootNamespace>AnonymousTokens.Shared</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\InMemory\private-key.pem" />
+    <None Remove="Services\InMemory\public-key.pem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Services\InMemory\private-key.pem" />
+    <EmbeddedResource Include="Services\InMemory\public-key.pem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
+  </ItemGroup>
+
+</Project>

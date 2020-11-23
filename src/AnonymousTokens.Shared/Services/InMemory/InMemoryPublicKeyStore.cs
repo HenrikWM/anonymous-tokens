@@ -1,6 +1,6 @@
-﻿using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Parameters;
 
-namespace AnonymousTokens.Services.InMemory
+namespace AnonymousTokens.Shared.Services.InMemory
 {
 
     public class InMemoryPublicKeyStore : IPublicKeyStore
