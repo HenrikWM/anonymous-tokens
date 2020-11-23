@@ -29,19 +29,6 @@ namespace AnonymousTokens.UnitTests
         }
 
         [Fact]
-        public void PointIsValid_PointIsNull_ReturnsFalse()
-        {
-            // Arrange
-            var curve = Fp.curve;
-
-            // Act
-            var actual = ECPointVerifier.PointIsValid(null, curve);
-
-            // Assert
-            Assert.False(actual);
-        }
-
-        [Fact]
         public void PointIsValid_PointIsNotOnCurve_ReturnsFalse()
         {
             // Arrange
