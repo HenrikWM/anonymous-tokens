@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>AnonymousTokens.Shared</AssemblyName>
     <RootNamespace>AnonymousTokens.Shared</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Services\InMemory\private-key.pem" />
     <EmbeddedResource Include="Services\InMemory\public-key.pem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
