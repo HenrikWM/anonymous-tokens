@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Henrik Walker Moe, Tjerand Silde, Martin Strand</Authors>
+    <Description>Anonymous tokens implementation in .NET based on Privacy Pass</Description>
+    <Copyright>Copyright Henrik Walker Moe, Tjerand Silde, Martin Strand</Copyright>
+    <LangVersion>latest</LangVersion>
+    <Features>strict</Features>
+    <Nullable>enable</Nullable>
+    <PackageTags>privacy-pass;anonymous-tokens</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <IsPackable>True</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <Version>0.2.0</Version>
+    <RepositoryUrl>https://github.com/HenrikWM/anonymous-tokens</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CS1701;CS1702;CS1591;CS1570</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

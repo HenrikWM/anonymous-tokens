@@ -1,26 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Authors>Henrik Walker Moe, Tjerand Silde, Martin Strand</Authors>
-    <Description>Anonymous tokens implementation in .NET based on Privacy Pass</Description>
-    <Copyright>Copyright Henrik Walker Moe, Tjerand Silde, Martin Strand</Copyright>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <Features>strict</Features>
-    <PackageTags>privacy-pass;anonymous-tokens</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <MinVerTagPrefix>v</MinVerTagPrefix>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-    <Version>0.1.0</Version>
-    <RepositoryUrl>https://github.com/HenrikWM/anonymous-tokens</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
+    <AssemblyName>AnonymousTokens</AssemblyName>
+    <RootNamespace>AnonymousTokens</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <PackageId>AnonymousTokens</PackageId>
+    <Product>AnonymousTokens</Product>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,10 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
   </ItemGroup>
+
 </Project>

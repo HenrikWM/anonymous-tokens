@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Console", "samples\C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4DDE2573-8947-4348-95B4-688102A8294D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens", "src\AnonymousTokens\AnonymousTokens.csproj", "{D98EB88A-9922-4AA5-8C97-6206C7196CD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Client", "src\AnonymousTokens.Client\AnonymousTokens.Client.csproj", "{D98EB88A-9922-4AA5-8C97-6206C7196CD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.TokenGeneration.Api", "samples\ClientServer\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj", "{E691A98B-3EBC-4AE7-8858-67601E805909}"
 EndProject
@@ -27,10 +27,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\CI.yml = .github\workflows\CI.yml
 		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
 		.github\dependabot.yml = .github\dependabot.yml
-		Directory.Build.props = Directory.Build.props
+		src\Directory.Build.props = src\Directory.Build.props
 		readme.md = readme.md
 		.github\workflows\Release.yml = .github\workflows\Release.yml
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Server", "src\AnonymousTokens.Server\AnonymousTokens.Server.csproj", "{EF827382-7F6E-4230-A917-9D11415ECAD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens", "src\AnonymousTokens\AnonymousTokens.csproj", "{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +62,14 @@ Global
 		{E24CF8EE-6D9B-49AC-92A5-EB1F81FDAAA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E24CF8EE-6D9B-49AC-92A5-EB1F81FDAAA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E24CF8EE-6D9B-49AC-92A5-EB1F81FDAAA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF827382-7F6E-4230-A917-9D11415ECAD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF827382-7F6E-4230-A917-9D11415ECAD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF827382-7F6E-4230-A917-9D11415ECAD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF827382-7F6E-4230-A917-9D11415ECAD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +81,8 @@ Global
 		{A4143A14-789E-4AD0-BAD9-BF5B32E24EC7} = {017DB04E-CA83-4400-90FD-4CA10428EC51}
 		{E24CF8EE-6D9B-49AC-92A5-EB1F81FDAAA2} = {4FB09123-E5E6-4367-BEDD-FF3D9906A2BA}
 		{017DB04E-CA83-4400-90FD-4CA10428EC51} = {645EAD64-C3E7-41AA-B7E4-E423DFFCEEDF}
+		{EF827382-7F6E-4230-A917-9D11415ECAD6} = {4DDE2573-8947-4348-95B4-688102A8294D}
+		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98} = {4DDE2573-8947-4348-95B4-688102A8294D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EC41792F-67C9-4BD6-B598-E3E2ECDD924C}

@@ -32,4 +32,5 @@ exec { & dotnet build -c Release }
 
 exec { & dotnet test -c Release -r $artifacts --no-build -l trx --verbosity=normal }
 
-exec { & dotnet pack .\src\AnonymousTokens\AnonymousTokens.csproj -c Release -o $artifacts --no-build }
+exec { & dotnet pack .\src\AnonymousTokens.Client\AnonymousTokens.Client.csproj -c Release -o $artifacts --no-build }
+exec { & dotnet pack .\src\AnonymousTokens.Server\AnonymousTokens.Server.csproj -c Release -o $artifacts --no-build }

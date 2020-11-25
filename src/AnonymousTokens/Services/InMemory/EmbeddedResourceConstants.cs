@@ -1,4 +1,4 @@
-﻿namespace AnonymousTokens.Services.InMemory
+namespace AnonymousTokens.Services.InMemory
 {
     internal static class EmbeddedResourceConstants
     {

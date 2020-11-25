@@ -3,7 +3,7 @@ using AnonymousTokens.Services;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
-namespace AnonymousTokens.Protocol
+namespace AnonymousTokens.Server.Protocol
 {
     public class TokenVerifier
     {

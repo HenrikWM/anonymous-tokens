@@ -1,8 +1,8 @@
 
-using AnonymousTokensConsole.ApiClients.TokenGeneration;
-
 using AnonymousTokens.Protocol;
 using AnonymousTokens.Services.InMemory;
+
+using AnonymousTokensConsole.ApiClients.TokenGeneration;
 
 using Client.Console.ApiClients.TokenVerification;
 

@@ -1,4 +1,5 @@
-using AnonymousTokens.Protocol;
+
+using AnonymousTokens.Server.Protocol;
 using AnonymousTokens.Services;
 using AnonymousTokens.Services.InMemory;
 
