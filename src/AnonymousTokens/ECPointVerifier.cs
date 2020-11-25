@@ -12,7 +12,7 @@ namespace AnonymousTokens
         /// <returns>True if the point is valid and otherwise false</returns>
         public static bool PointIsValid(ECPoint point, ECCurve curve)
         {
-            if (point == null || !curve.Equals(point.Curve) || point.Multiply(curve.Cofactor).Equals(curve.Infinity))
+            if (!point.IsValid() || !curve.Equals(point.Curve) || point.Multiply(curve.Cofactor).Equals(curve.Infinity))
             {
                 return false;
             }
