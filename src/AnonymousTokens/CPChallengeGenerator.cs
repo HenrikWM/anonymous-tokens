@@ -34,7 +34,7 @@ namespace AnonymousTokens
             byte[]? YEncoded = Y.GetEncoded();
 
             // Domain separation: make sure hash is independent of other systems
-            string? domain = "smittestopptoken";
+            string? domain = "AnonymousTokens";
             byte[]? domainEncoded = Encoding.ASCII.GetBytes(domain);
 
             // Using concat() is best for performance: https://stackoverflow.com/a/415396
