@@ -1,4 +1,5 @@
 using AnonymousTokens.Protocol;
+using AnonymousTokens.Server.Protocol;
 using AnonymousTokens.Services.InMemory;
 
 using Org.BouncyCastle.Asn1.X9;
