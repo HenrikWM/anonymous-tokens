@@ -1,3 +1,4 @@
+
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
@@ -7,7 +8,7 @@ using System;
 
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
-namespace AnonymousTokens.Protocol
+namespace AnonymousTokens.Server.Protocol
 {
     public class TokenGenerator
     {
