@@ -38,7 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Server", "src\AnonymousTokens.Server\AnonymousTokens.Server.csproj", "{EF827382-7F6E-4230-A917-9D11415ECAD6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Shared", "src\AnonymousTokens.Shared\AnonymousTokens.Shared.csproj", "{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens", "src\AnonymousTokens\AnonymousTokens.csproj", "{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

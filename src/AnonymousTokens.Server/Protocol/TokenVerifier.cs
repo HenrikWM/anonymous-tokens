@@ -1,5 +1,4 @@
-using AnonymousTokens.Shared;
-using AnonymousTokens.Shared.Services;
+using AnonymousTokens.Services;
 
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;

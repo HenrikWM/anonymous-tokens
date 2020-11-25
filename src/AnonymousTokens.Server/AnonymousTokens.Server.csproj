@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnonymousTokens.Shared\AnonymousTokens.Shared.csproj" />
+    <ProjectReference Include="..\AnonymousTokens\AnonymousTokens.csproj" />
   </ItemGroup>
 
 </Project>

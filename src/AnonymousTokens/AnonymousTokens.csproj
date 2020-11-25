@@ -2,9 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <AssemblyName>AnonymousTokens.Shared</AssemblyName>
-    <RootNamespace>AnonymousTokens.Shared</RootNamespace>
+    <AssemblyName>AnonymousTokens</AssemblyName>
+    <RootNamespace>AnonymousTokens</RootNamespace>
     <IsPackable>false</IsPackable>
+    <PackageId>AnonymousTokens</PackageId>
+    <Product>AnonymousTokens</Product>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
-using AnonymousTokens.Shared.Services;
-using AnonymousTokens.Shared.Services.InMemory;
+
+using AnonymousTokens.Services;
+using AnonymousTokens.Services.InMemory;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
