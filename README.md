@@ -46,7 +46,7 @@ Run all benchmarks:
 
 `dotnet run -c Release --filter *`
 
-When complete you will see the output generated in a new `BenchmarkDotNet.Artifacts` folder.
+When complete you will see the output generated in a new `BenchmarkDotNet.Artifacts\results` folder.
 
 ## Sources
 
