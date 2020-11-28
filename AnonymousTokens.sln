@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Server", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens", "src\AnonymousTokens\AnonymousTokens.csproj", "{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnonymousTokens.Benchmarks", "test\AnonymousTokens.Benchmarks\AnonymousTokens.Benchmarks.csproj", "{FE1684A8-5257-48B5-A067-836D75831D15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE1684A8-5257-48B5-A067-836D75831D15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE1684A8-5257-48B5-A067-836D75831D15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE1684A8-5257-48B5-A067-836D75831D15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE1684A8-5257-48B5-A067-836D75831D15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +89,7 @@ Global
 		{017DB04E-CA83-4400-90FD-4CA10428EC51} = {645EAD64-C3E7-41AA-B7E4-E423DFFCEEDF}
 		{EF827382-7F6E-4230-A917-9D11415ECAD6} = {4DDE2573-8947-4348-95B4-688102A8294D}
 		{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98} = {4DDE2573-8947-4348-95B4-688102A8294D}
+		{FE1684A8-5257-48B5-A067-836D75831D15} = {4FB09123-E5E6-4367-BEDD-FF3D9906A2BA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EC41792F-67C9-4BD6-B598-E3E2ECDD924C}
