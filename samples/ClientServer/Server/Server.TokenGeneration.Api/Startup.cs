@@ -1,4 +1,8 @@
 
+using AnonymousTokens.Server.Protocol;
+using AnonymousTokens.Services;
+using AnonymousTokens.Services.InMemory;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +17,12 @@ namespace Server.Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // Configure AnonymousTokens DI
+            services.AddSingleton<ISeedStore, InMemorySeedStore>();
+            services.AddSingleton<IPrivateKeyStore, InMemoryPrivateKeyStore>();
+            services.AddSingleton<IPublicKeyStore, InMemoryPublicKeyStore>();
+            services.AddSingleton<ITokenGenerator, TokenGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

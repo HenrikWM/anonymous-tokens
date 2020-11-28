@@ -2,6 +2,7 @@
 using Org.BouncyCastle.Utilities.Encoders;
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AnonymousTokens.Services.InMemory
 {
@@ -9,20 +10,20 @@ namespace AnonymousTokens.Services.InMemory
     {
         private static readonly HashSet<string> _storage = new HashSet<string>();
 
-        public bool Exists(byte[] t)
+        public Task<bool> ExistsAsync(byte[] t)
         {
             var tAsHex = Hex.ToHexString(t);
 
-            return _storage.Contains(tAsHex);
+            return Task.FromResult(_storage.Contains(tAsHex));
         }
 
-        public bool Save(byte[] t)
+        public Task<bool> SaveAsync(byte[] t)
         {
             var tAsHex = Hex.ToHexString(t);
 
             _storage.Add(tAsHex);
 
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

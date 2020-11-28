@@ -28,7 +28,7 @@ namespace AnonymousTokensConsole
             var ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
             var publicKeyStore = new InMemoryPublicKeyStore();
-            var publicKey = publicKeyStore.Get();
+            var publicKey = await publicKeyStore.GetAsync();
 
             _initiator = new Initiator(publicKey);
 

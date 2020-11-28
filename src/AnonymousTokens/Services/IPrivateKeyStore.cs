@@ -1,9 +1,11 @@
 using Org.BouncyCastle.Math;
 
+using System.Threading.Tasks;
+
 namespace AnonymousTokens.Services
 {
     public interface IPrivateKeyStore
     {
-        public BigInteger Get();
+        public Task<BigInteger> GetAsync();
     }
 }
