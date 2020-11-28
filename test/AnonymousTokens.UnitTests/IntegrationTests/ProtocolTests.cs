@@ -185,7 +185,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             {
                 var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_ecParameters, invalidP);
             }
-            catch (AnonymousTokensException e)
+            catch (AnonymousTokensException)
             {
                 Assert.True(true, "an invalid point should raise an exception");
             }
@@ -218,7 +218,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             {
                 _tokenVerifier.VerifyToken(_ecParameters.Curve, t, invalidW);
             }
-            catch (AnonymousTokensException e)
+            catch (AnonymousTokensException)
             {
                 Assert.True(true, "an invalid point should raise an exception");
             }
