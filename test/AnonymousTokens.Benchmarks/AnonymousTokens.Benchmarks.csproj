@@ -5,8 +5,9 @@
     <OutputType>Exe</OutputType>
     <!-- BenchmarkDotNet 0.12.1 has an issue and doesn't support latest value. To remove for the next version. -->
     <LangVersion>7.3</LangVersion>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>portable</DebugType>
@@ -15,14 +16,14 @@
     <Optimize>true</Optimize>
     <Configuration>Release</Configuration>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
   </ItemGroup>
 
-  <ItemGroup>    
+  <ItemGroup>
     <ProjectReference Include="..\..\src\AnonymousTokens.Client\AnonymousTokens.Client.csproj" />
     <ProjectReference Include="..\..\src\AnonymousTokens.Server\AnonymousTokens.Server.csproj" />
   </ItemGroup>
-  
+
 </Project>
