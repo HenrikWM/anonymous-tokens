@@ -7,6 +7,7 @@ using BenchmarkDotNet.Attributes;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
 
 using System;
 
@@ -25,6 +26,9 @@ namespace AnonymousTokens.Benchmarks
         private TokenGenerator _tokenGeneratorWithGeneratedKeys;
         private TokenVerifier _tokenVerifierWithGeneratedKey;
 
+        private BigInteger _privateKey;
+        private ECPrivateKeyParameters _privateKeyGenerated;
+
         [GlobalSetup]
         public void Setup()
         {
@@ -42,23 +46,23 @@ namespace AnonymousTokens.Benchmarks
             var publicKey = publicKeyStore.Get();
 
             var privateKeyStore = new InMemoryPrivateKeyStore();
-            var privateKey = privateKeyStore.Get();
+            _privateKey = privateKeyStore.Get();
 
             _initiator = new Initiator(publicKey);
-            _tokenGenerator = new TokenGenerator(publicKey, privateKey);
-            _tokenVerifier = new TokenVerifier(privateKey, new InMemorySeedStore());
+            _tokenGenerator = new TokenGenerator(publicKey, _privateKey);
+            _tokenVerifier = new TokenVerifier(new InMemorySeedStore());
         }
 
         private void SetupWithGeneratedKeys()
         {
             var keyPair = KeyPairGenerator.CreateKeyPair(_ecParameters);
 
-            var privateKey = keyPair.Private as ECPrivateKeyParameters;
+            _privateKeyGenerated = keyPair.Private as ECPrivateKeyParameters;
             var publicKey = keyPair.Public as ECPublicKeyParameters;
 
             _initiatorWithGeneratedKey = new Initiator(publicKey);
-            _tokenGeneratorWithGeneratedKeys = new TokenGenerator(publicKey, privateKey.D);
-            _tokenVerifierWithGeneratedKey = new TokenVerifier(privateKey.D, new InMemorySeedStore());
+            _tokenGeneratorWithGeneratedKeys = new TokenGenerator(publicKey, _privateKeyGenerated.D);
+            _tokenVerifierWithGeneratedKey = new TokenVerifier(new InMemorySeedStore());
         }
 
         [Benchmark(Baseline = true)]
@@ -77,7 +81,7 @@ namespace AnonymousTokens.Benchmarks
             var W = _initiator.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = _tokenVerifier.VerifyToken(_ecParameters.Curve, t, W);
+            var isVerified = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");
@@ -100,7 +104,7 @@ namespace AnonymousTokens.Benchmarks
             var W = _initiatorWithGeneratedKey.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = _tokenVerifierWithGeneratedKey.VerifyToken(_ecParameters.Curve, t, W);
+            var isVerified = _tokenVerifierWithGeneratedKey.VerifyToken(_privateKeyGenerated.D, _ecParameters.Curve, t, W);
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");

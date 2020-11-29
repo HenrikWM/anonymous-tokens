@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Utilities.Encoders;
 
 using Server.TokenVerification.Api.Models;
@@ -18,6 +19,7 @@ namespace Server.TokenVerification.Api.Controllers
     public class TokenController : ControllerBase
     {
         private readonly X9ECParameters _ecParameters;
+        private readonly BigInteger _privateKey;
         private readonly TokenVerifier _tokenVerifier;
 
         public TokenController(ISeedStore seedStore)
@@ -25,9 +27,9 @@ namespace Server.TokenVerification.Api.Controllers
             _ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
             var privateKeyStore = new InMemoryPrivateKeyStore();
-            var privateKey = privateKeyStore.Get();
+            _privateKey = privateKeyStore.Get();
 
-            _tokenVerifier = new TokenVerifier(privateKey, seedStore);
+            _tokenVerifier = new TokenVerifier(seedStore);
         }
 
         [Route("verify")]
@@ -37,7 +39,7 @@ namespace Server.TokenVerification.Api.Controllers
             var t = Hex.Decode(model.tAsHex);
             var W = _ecParameters.Curve.DecodePoint(Hex.Decode(model.WAsHex));
 
-            var isValid = _tokenVerifier.VerifyToken(_ecParameters.Curve, t, W);
+            var isValid = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
 
             return isValid;
         }

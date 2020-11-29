@@ -83,7 +83,5 @@ namespace AnonymousTokens.Server.Protocol
 
             return (c, z);
         }
-
-
     }
 }
