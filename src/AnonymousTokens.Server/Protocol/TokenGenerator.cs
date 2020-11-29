@@ -21,6 +21,8 @@ namespace AnonymousTokens.Server.Protocol
         /// </summary>
         private readonly ECPoint _K;
 
+        private readonly SecureRandom _random;
+
         /// <summary>
         /// Creates an instance of TokenGenerator with a key pair.
         /// </summary>
@@ -30,6 +32,7 @@ namespace AnonymousTokens.Server.Protocol
         {
             _k = k;
             _K = publicKeyParameters.Q;
+            _random = new SecureRandom();
         }
 
         /// <summary>
@@ -65,10 +68,8 @@ namespace AnonymousTokens.Server.Protocol
         /// <returns></returns>
         private (BigInteger c, BigInteger z) CreateProof(X9ECParameters ecParameters, ECPoint P, ECPoint Q)
         {
-            SecureRandom? random = new SecureRandom();
-
             // Sample a random integer 0 < r < N
-            BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(ecParameters.Curve, random);
+            BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(ecParameters.Curve, _random);
 
             // Computes X = r*G
             ECPoint X = ecParameters.G.Multiply(r);

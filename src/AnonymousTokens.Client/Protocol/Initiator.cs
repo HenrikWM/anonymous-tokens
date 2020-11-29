@@ -14,6 +14,8 @@ namespace AnonymousTokens.Protocol
         /// </summary>
         private readonly ECPoint _K;
 
+        private readonly SecureRandom _random;
+
         /// <summary>
         /// Creates Initiator with the Public key.
         /// </summary>
@@ -21,6 +23,7 @@ namespace AnonymousTokens.Protocol
         public Initiator(ECPublicKeyParameters publicKeyParameters)
         {
             _K = publicKeyParameters.Q;
+            _random = new SecureRandom();
         }
 
         /// <summary>
@@ -30,9 +33,7 @@ namespace AnonymousTokens.Protocol
         /// <returns>The seed t for a random point, the initial mask r of the point, and the masked point P</returns>
         public (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve)
         {
-            SecureRandom? random = new SecureRandom();
-
-            BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(curve, random);
+            BigInteger r = ECCurveRandomNumberGenerator.GenerateRandomNumber(curve, _random);
 
             // Sample random bytes t such that x = hash(t) is a valid
             // x-coordinate on the curve. Then T = HashToWeierstrassCurve(t).
@@ -40,7 +41,7 @@ namespace AnonymousTokens.Protocol
             ECPoint? T;
             for (; ; )
             {
-                random.NextBytes(t);
+                _random.NextBytes(t);
                 T = ECCurveHash.HashToWeierstrassCurve(curve, t);
                 if (T == null)
                     continue;
