@@ -5,7 +5,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
-namespace AnonymousTokens.Protocol
+namespace AnonymousTokens.Client.Protocol
 {
     public interface IInitiator
     {

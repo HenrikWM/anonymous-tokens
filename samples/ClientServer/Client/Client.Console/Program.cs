@@ -1,5 +1,5 @@
 
-using AnonymousTokens.Protocol;
+using AnonymousTokens.Client.Protocol;
 using AnonymousTokens.Services.InMemory;
 
 using AnonymousTokensConsole.ApiClients.TokenGeneration;
