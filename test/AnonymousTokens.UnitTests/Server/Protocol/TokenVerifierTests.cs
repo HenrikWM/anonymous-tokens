@@ -9,6 +9,8 @@ using Org.BouncyCastle.Crypto.EC;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Utilities.Encoders;
 
+using System.Threading.Tasks;
+
 using Xunit;
 
 namespace AnonymousTokens.UnitTests.Server.Protocol
@@ -23,12 +25,12 @@ namespace AnonymousTokens.UnitTests.Server.Protocol
         }
 
         [Fact]
-        public void VerifyToken_RecreatedPointMatchesW_ReturnsTrue()
+        public async void VerifyToken_RecreatedPointMatchesW_ReturnsTrue()
         {
             // Arrange
             var seedStoreMock = new Mock<ISeedStore>();
-            seedStoreMock.Setup(x => x.Exists(It.IsAny<byte[]>())).Returns(false);
-            seedStoreMock.Setup(x => x.Save(It.IsAny<byte[]>())).Returns(true);
+            seedStoreMock.Setup(x => x.ExistsAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(false));
+            seedStoreMock.Setup(x => x.SaveAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(true));
 
             var tokenVerifier = new TokenVerifier(seedStoreMock.Object);
 
@@ -37,20 +39,20 @@ namespace AnonymousTokens.UnitTests.Server.Protocol
             var W = _ecParameters.Curve.DecodePoint(Hex.Decode("04ce1e55cff15c5f5fbd0abca2a2849cf04ccda1c601a849ab28eb6161a0c32e96b6346728d8d3464754361977ee1a1c68120cb0575506cafe6e24d595de92069d"));
 
             // Act
-            var actual = tokenVerifier.VerifyToken(privateKey, _ecParameters.Curve, t, W);
+            var actual = await tokenVerifier.VerifyTokenAsync(privateKey, _ecParameters.Curve, t, W);
 
             // Assert
-            seedStoreMock.Verify(mock => mock.Save(It.IsAny<byte[]>()), Times.Once());
+            seedStoreMock.Verify(mock => mock.SaveAsync(It.IsAny<byte[]>()), Times.Once());
             Assert.True(actual);
         }
 
         [Fact]
-        public void VerifyToken_RecreatedPointDoesNotMatchW_ReturnsFalse()
+        public async void VerifyToken_RecreatedPointDoesNotMatchW_ReturnsFalse()
         {
             // Arrange
             var seedStoreMock = new Mock<ISeedStore>();
-            seedStoreMock.Setup(x => x.Exists(It.IsAny<byte[]>())).Returns(false);
-            seedStoreMock.Setup(x => x.Save(It.IsAny<byte[]>())).Returns(true);
+            seedStoreMock.Setup(x => x.ExistsAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(false));
+            seedStoreMock.Setup(x => x.SaveAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(true));
 
             var tokenVerifier = new TokenVerifier(seedStoreMock.Object);
 
@@ -62,19 +64,19 @@ namespace AnonymousTokens.UnitTests.Server.Protocol
             var wrongW = W.Add(W);
 
             // Act
-            var actual = tokenVerifier.VerifyToken(privateKey, _ecParameters.Curve, t, wrongW);
+            var actual = await tokenVerifier.VerifyTokenAsync(privateKey, _ecParameters.Curve, t, wrongW);
 
             // Assert
             Assert.False(actual, "a wrong point was expected to fail verification");
         }
 
         [Fact]
-        public void VerifyToken_InvalidW_ThrowsException()
+        public async void VerifyToken_InvalidW_ThrowsException()
         {
             // Arrange
             var seedStoreMock = new Mock<ISeedStore>();
-            seedStoreMock.Setup(x => x.Exists(It.IsAny<byte[]>())).Returns(false);
-            seedStoreMock.Setup(x => x.Save(It.IsAny<byte[]>())).Returns(true);
+            seedStoreMock.Setup(x => x.ExistsAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(false));
+            seedStoreMock.Setup(x => x.SaveAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(true));
 
             var tokenVerifier = new TokenVerifier(seedStoreMock.Object);
 
@@ -88,7 +90,7 @@ namespace AnonymousTokens.UnitTests.Server.Protocol
             try
             {
                 // Act
-                tokenVerifier.VerifyToken(privateKey, _ecParameters.Curve, t, invalidW);
+                await tokenVerifier.VerifyTokenAsync(privateKey, _ecParameters.Curve, t, invalidW);
             }
             catch (AnonymousTokensException)
             {
@@ -97,11 +99,11 @@ namespace AnonymousTokens.UnitTests.Server.Protocol
         }
 
         [Fact]
-        public void VerifyToken_tExistsInSeedStore_ReturnsFalse()
+        public async void VerifyToken_tExistsInSeedStore_ReturnsFalse()
         {
             // Arrange
             var seedStoreMock = new Mock<ISeedStore>();
-            seedStoreMock.Setup(x => x.Exists(It.IsAny<byte[]>())).Returns(true);
+            seedStoreMock.Setup(x => x.ExistsAsync(It.IsAny<byte[]>())).Returns(Task.FromResult(true));
 
             var privateKey = new BigInteger(Hex.Decode("01301abfe491c0aff380269c966254ac43fdd97469234c7739ada975368181fe"));
             byte[] t = Hex.Decode("4391837b1e50cb0b075fc91ea9a85a4a795195557f4fb9a971e10b94370dee2b");
@@ -110,7 +112,7 @@ namespace AnonymousTokens.UnitTests.Server.Protocol
             var tokenVerifier = new TokenVerifier(seedStoreMock.Object);
 
             // Act
-            var actual = tokenVerifier.VerifyToken(privateKey, _ecParameters.Curve, t, W);
+            var actual = await tokenVerifier.VerifyTokenAsync(privateKey, _ecParameters.Curve, t, W);
 
             // Assert
             Assert.False(actual);

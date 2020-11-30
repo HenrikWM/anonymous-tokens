@@ -1,16 +1,16 @@
 
 using AnonymousTokens.Server.Protocol;
 using AnonymousTokens.Services;
-using AnonymousTokens.Services.InMemory;
 
 using Microsoft.AspNetCore.Mvc;
 
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;
-using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Utilities.Encoders;
 
 using Server.TokenVerification.Api.Models;
+
+using System.Threading.Tasks;
 
 namespace Server.TokenVerification.Api.Controllers
 {
@@ -19,27 +19,27 @@ namespace Server.TokenVerification.Api.Controllers
     public class TokenController : ControllerBase
     {
         private readonly X9ECParameters _ecParameters;
-        private readonly BigInteger _privateKey;
-        private readonly TokenVerifier _tokenVerifier;
+        private readonly IPrivateKeyStore _privateKeyStore;
+        private readonly ITokenVerifier _tokenVerifier;
 
-        public TokenController(ISeedStore seedStore)
+        public TokenController(
+            IPrivateKeyStore privateKeyStore,
+            ITokenVerifier tokenVerifier)
         {
+            _privateKeyStore = privateKeyStore;
+            _tokenVerifier = tokenVerifier;
             _ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
-
-            var privateKeyStore = new InMemoryPrivateKeyStore();
-            _privateKey = privateKeyStore.Get();
-
-            _tokenVerifier = new TokenVerifier(seedStore);
         }
 
         [Route("verify")]
         [HttpPost]
-        public bool Verify(VerifyTokenRequestModel model)
+        public async Task<bool> Verify(VerifyTokenRequestModel model)
         {
+            var k = await _privateKeyStore.GetAsync();
             var t = Hex.Decode(model.tAsHex);
             var W = _ecParameters.Curve.DecodePoint(Hex.Decode(model.WAsHex));
 
-            var isValid = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
+            var isValid = await _tokenVerifier.VerifyTokenAsync(k, _ecParameters.Curve, t, W);
 
             return isValid;
         }

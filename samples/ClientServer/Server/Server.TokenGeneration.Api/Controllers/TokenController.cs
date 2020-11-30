@@ -1,5 +1,5 @@
 using AnonymousTokens.Server.Protocol;
-using AnonymousTokens.Services.InMemory;
+using AnonymousTokens.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +9,8 @@ using Org.BouncyCastle.Utilities.Encoders;
 
 using Server.TokenGeneration.Api.Models;
 
+using System.Threading.Tasks;
+
 namespace Server.TokenGeneration.Api.Controllers
 {
     [ApiController]
@@ -16,28 +18,30 @@ namespace Server.TokenGeneration.Api.Controllers
     public class TokenController : ControllerBase
     {
         private readonly X9ECParameters _ecParameters;
-        private readonly TokenGenerator _tokenGenerator;
+        private readonly IPrivateKeyStore _privateKeyStore;
+        private readonly IPublicKeyStore _publicKeyStore;
+        private readonly ITokenGenerator _tokenGenerator;
 
-        public TokenController()
+        public TokenController(
+            IPrivateKeyStore privateKeyStore,
+            IPublicKeyStore publicKeyStore,
+            ITokenGenerator tokenGenerator)
         {
+            _privateKeyStore = privateKeyStore;
+            _publicKeyStore = publicKeyStore;
+            _tokenGenerator = tokenGenerator;
             _ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
-
-            var publicKeyStore = new InMemoryPublicKeyStore();
-            var publicKey = publicKeyStore.Get();
-
-            var privateKeyStore = new InMemoryPrivateKeyStore();
-            var privateKey = privateKeyStore.Get();
-
-            _tokenGenerator = new TokenGenerator(publicKey, privateKey);
         }
 
         [Route("generate")]
         [HttpPost]
-        public GenerateTokenResponseModel Generate(GenerateTokenRequestModel model)
+        public async Task<GenerateTokenResponseModel> Generate(GenerateTokenRequestModel model)
         {
+            var k = await _privateKeyStore.GetAsync();
+            var K = await _publicKeyStore.GetAsync();
             var P = _ecParameters.Curve.DecodePoint(Hex.Decode(model.PAsHex));
 
-            var token = _tokenGenerator.GenerateToken(_ecParameters, P);
+            var token = _tokenGenerator.GenerateToken(k, K.Q, _ecParameters, P);
             var Q = token.Q;
             var c = token.c;
             var z = token.z;

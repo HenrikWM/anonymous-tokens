@@ -1,4 +1,5 @@
 
+using AnonymousTokens.Server.Protocol;
 using AnonymousTokens.Services;
 using AnonymousTokens.Services.InMemory;
 
@@ -17,7 +18,10 @@ namespace Server.VerificationBackend
         {
             services.AddControllers();
 
+            // Configure AnonymousTokens DI
             services.AddSingleton<ISeedStore, InMemorySeedStore>();
+            services.AddSingleton<IPrivateKeyStore, InMemoryPrivateKeyStore>();
+            services.AddSingleton<ITokenVerifier, TokenVerifier>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

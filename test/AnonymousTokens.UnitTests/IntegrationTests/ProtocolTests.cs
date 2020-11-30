@@ -4,8 +4,8 @@ using AnonymousTokens.Services.InMemory;
 
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Utilities.Encoders;
 
 using Xunit;
 
@@ -13,13 +13,15 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
 {
     public class ProtocolTests
     {
-        private Initiator _initiator;
-        private TokenGenerator _tokenGenerator;
-        private TokenGenerator _corruptedTokenGenerator;
-        private TokenVerifier _tokenVerifier;
-        private X9ECParameters _ecParameters;
-        private BigInteger _privateKey;
-        private BigInteger _wrongPrivateKey;
+        private readonly X9ECParameters _ecParameters;
+
+        private readonly Initiator _initiator;
+        private readonly TokenGenerator _tokenGenerator;
+        private readonly TokenVerifier _tokenVerifier;
+
+        private readonly BigInteger _privateKey;
+        private readonly BigInteger _wrongPrivateKey;
+        private readonly ECPublicKeyParameters _publicKey;
 
         public ProtocolTests()
         {
@@ -27,22 +29,19 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             _ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
             var publicKeyStore = new InMemoryPublicKeyStore();
-            var publicKey = publicKeyStore.Get();
+            _publicKey = publicKeyStore.GetAsync().GetAwaiter().GetResult();
 
             var privateKeyStore = new InMemoryPrivateKeyStore();
-            _privateKey = privateKeyStore.Get();
+            _privateKey = privateKeyStore.GetAsync().GetAwaiter().GetResult();
             _wrongPrivateKey = _privateKey.Add(BigInteger.One);
 
-            _initiator = new Initiator(publicKey);
-
-            _tokenGenerator = new TokenGenerator(publicKey, _privateKey);
-            _corruptedTokenGenerator = new TokenGenerator(publicKey, _wrongPrivateKey);
-
+            _initiator = new Initiator();
+            _tokenGenerator = new TokenGenerator();
             _tokenVerifier = new TokenVerifier(new InMemorySeedStore());
         }
 
         [Fact]
-        public void Run()
+        public async void Run()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(_ecParameters.Curve);
@@ -51,14 +50,13 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_publicKey.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            string s = Hex.ToHexString(_privateKey.ToByteArray());
-            var isVerified = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
+            var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
             if (isVerified == false)
             {
                 Assert.True(false, "token was expected to be valid");
@@ -66,7 +64,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
         }
 
         [Fact]
-        public void Run_FailWhenSeedIsReplayed()
+        public async void Run_FailWhenSeedIsReplayed()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(_ecParameters.Curve);
@@ -75,20 +73,20 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_publicKey.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
+            var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
             if (isVerified == false)
             {
                 Assert.True(false, "token was expected to be valid");
             }
 
             // 5. Replay token verification with seed t
-            isVerified = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
+            isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
             if (isVerified == true)
             {
                 Assert.True(false, "token was replayed and was expected to be not valid");
@@ -105,10 +103,10 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2'. Generate invalid token and proof
-            var (Q, proofC, proofZ) = _corruptedTokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_wrongPrivateKey, _publicKey.Q, _ecParameters, P);
 
             // Verify the proof
-            var isValid = _initiator.VerifyProof(_ecParameters, P, Q, proofC, proofZ);
+            var isValid = _initiator.VerifyProof(_publicKey.Q, _ecParameters, P, Q, proofC, proofZ);
             Assert.False(isValid, "Keys were incorrect and the proof did not get verified");
         }
 
@@ -122,13 +120,13 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2'. Generate invalid token and proof
-            var (Q, proofC, proofZ) = _corruptedTokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_wrongPrivateKey, _publicKey.Q, _ecParameters, P);
 
             // Change the point Q to something else
             var changedQ = Q.Twice();
 
             // Try randomising the token
-            var isValid = _initiator.VerifyProof(_ecParameters, P, changedQ, proofC, proofZ);
+            var isValid = _initiator.VerifyProof(_publicKey.Q, _ecParameters, P, changedQ, proofC, proofZ);
             Assert.False(isValid, "The token was malformed and the proof did not get verified");
         }
 
@@ -142,13 +140,13 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2'. Generate invalid token and proof
-            var (Q, proofC, proofZ) = _corruptedTokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_wrongPrivateKey, _publicKey.Q, _ecParameters, P);
 
             // Change the challenge proofC to something else
             var changedC = proofC.Add(BigInteger.One);
 
             // Try randomising the token
-            var isValid = _initiator.VerifyProof(_ecParameters, P, Q, changedC, proofZ);
+            var isValid = _initiator.VerifyProof(_publicKey.Q, _ecParameters, P, Q, changedC, proofZ);
             Assert.False(isValid, "The challenge was changed and the proof did not get verified");
         }
 
@@ -162,13 +160,13 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2'. Generate invalid token and proof
-            var (Q, proofC, proofZ) = _corruptedTokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_wrongPrivateKey, _publicKey.Q, _ecParameters, P);
 
             // Change the challenge proofC to something else
             var changedZ = proofZ.Add(BigInteger.One);
 
             // Try randomising the token
-            var isValid = _initiator.VerifyProof(_ecParameters, P, Q, proofC, changedZ);
+            var isValid = _initiator.VerifyProof(_publicKey.Q, _ecParameters, P, Q, proofC, changedZ);
             Assert.False(isValid, "The response was changed and the proof did not get verified");
         }
 
@@ -187,7 +185,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             // 2. Generate token Q = k*P and proof (c,z) of correctness
             try
             {
-                var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_ecParameters, invalidP);
+                var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, invalidP);
             }
             catch (AnonymousTokensException)
             {
@@ -196,7 +194,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
         }
 
         [Fact]
-        public void Run_FailWhenWIsInvalid()
+        public async void Run_FailWhenWIsInvalid()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(_ecParameters.Curve);
@@ -205,10 +203,10 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_publicKey.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // Create a new point with invalid coordinates
             var invalidW = _ecParameters.Curve.CreatePoint(W.XCoord.ToBigInteger().Add(BigInteger.One), W.YCoord.ToBigInteger());
@@ -220,14 +218,14 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
 
             try
             {
-                _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, invalidW);
+                await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, invalidW);
             }
             catch (AnonymousTokensException)
             {
                 Assert.True(true, "an invalid point should raise an exception");
             }
 
-            var isVerified = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, wrongW);
+            var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, wrongW);
             Assert.False(isVerified, "a wrong point was expected to fail verification");
         }
     }

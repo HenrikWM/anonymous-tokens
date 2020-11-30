@@ -22,12 +22,15 @@ namespace AnonymousTokens.Benchmarks
         private TokenGenerator _tokenGenerator;
         private TokenVerifier _tokenVerifier;
 
+        private BigInteger _privateKey;
+        private ECPublicKeyParameters _publicKey;
+
         private Initiator _initiatorWithGeneratedKey;
         private TokenGenerator _tokenGeneratorWithGeneratedKeys;
         private TokenVerifier _tokenVerifierWithGeneratedKey;
 
-        private BigInteger _privateKey;
-        private ECPrivateKeyParameters _privateKeyGenerated;
+        private BigInteger _privateKeyGenerated;
+        private ECPublicKeyParameters _publicKeyGenerated;
 
         [GlobalSetup]
         public void Setup()
@@ -43,13 +46,13 @@ namespace AnonymousTokens.Benchmarks
         private void SetupWithInMemoryKeyStores()
         {
             var publicKeyStore = new InMemoryPublicKeyStore();
-            var publicKey = publicKeyStore.Get();
+            _publicKey = publicKeyStore.GetAsync().GetAwaiter().GetResult();
 
             var privateKeyStore = new InMemoryPrivateKeyStore();
-            _privateKey = privateKeyStore.Get();
+            _privateKey = privateKeyStore.GetAsync().GetAwaiter().GetResult();
 
-            _initiator = new Initiator(publicKey);
-            _tokenGenerator = new TokenGenerator(publicKey, _privateKey);
+            _initiator = new Initiator();
+            _tokenGenerator = new TokenGenerator();
             _tokenVerifier = new TokenVerifier(new InMemorySeedStore());
         }
 
@@ -57,16 +60,16 @@ namespace AnonymousTokens.Benchmarks
         {
             var keyPair = KeyPairGenerator.CreateKeyPair(_ecParameters);
 
-            _privateKeyGenerated = keyPair.Private as ECPrivateKeyParameters;
-            var publicKey = keyPair.Public as ECPublicKeyParameters;
+            _privateKeyGenerated = (keyPair.Private as ECPrivateKeyParameters).D;
+            _publicKeyGenerated = keyPair.Public as ECPublicKeyParameters;
 
-            _initiatorWithGeneratedKey = new Initiator(publicKey);
-            _tokenGeneratorWithGeneratedKeys = new TokenGenerator(publicKey, _privateKeyGenerated.D);
+            _initiatorWithGeneratedKey = new Initiator();
+            _tokenGeneratorWithGeneratedKeys = new TokenGenerator();
             _tokenVerifierWithGeneratedKey = new TokenVerifier(new InMemorySeedStore());
         }
 
         [Benchmark(Baseline = true)]
-        public void RunProtocolEndToEnd()
+        public async void RunProtocolEndToEnd()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(_ecParameters.Curve);
@@ -75,13 +78,13 @@ namespace AnonymousTokens.Benchmarks
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_publicKey.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = _tokenVerifier.VerifyToken(_privateKey, _ecParameters.Curve, t, W);
+            var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");
@@ -89,7 +92,7 @@ namespace AnonymousTokens.Benchmarks
         }
 
         [Benchmark]
-        public void RunProtocolEndToEnd_WithGeneratedKeys()
+        public async void RunProtocolEndToEnd_WithGeneratedKeysAsync()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiatorWithGeneratedKey.Initiate(_ecParameters.Curve);
@@ -98,13 +101,13 @@ namespace AnonymousTokens.Benchmarks
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = _tokenGeneratorWithGeneratedKeys.GenerateToken(_ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGeneratorWithGeneratedKeys.GenerateToken(_privateKeyGenerated, _publicKeyGenerated.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiatorWithGeneratedKey.RandomiseToken(_ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiatorWithGeneratedKey.RandomiseToken(_publicKeyGenerated.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = _tokenVerifierWithGeneratedKey.VerifyToken(_privateKeyGenerated.D, _ecParameters.Curve, t, W);
+            var isVerified = await _tokenVerifierWithGeneratedKey.VerifyTokenAsync(_privateKeyGenerated, _ecParameters.Curve, t, W);
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");

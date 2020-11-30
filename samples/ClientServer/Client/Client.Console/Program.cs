@@ -28,9 +28,9 @@ namespace AnonymousTokensConsole
             var ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
             var publicKeyStore = new InMemoryPublicKeyStore();
-            var publicKey = publicKeyStore.Get();
+            var publicKey = await publicKeyStore.GetAsync();
 
-            _initiator = new Initiator(publicKey);
+            _initiator = new Initiator();
 
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(ecParameters.Curve);
@@ -42,7 +42,7 @@ namespace AnonymousTokensConsole
             var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(publicKey.Q, ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
             var isVerified = await _tokenVerificationClient.VerifyTokenAsync(t, W);
