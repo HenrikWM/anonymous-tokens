@@ -50,7 +50,7 @@ namespace AnonymousTokens.Server.Protocol
             ECPoint? Q = P.Multiply(k);
 
             // Chaum-Pedersen proof of correct signature
-            var (c, z) = CreateProof(k, K, ecParameters, P, Q);
+            var (c, z) = CreateProof(ecParameters, k, K, P, Q);
 
             return (Q, c, z);
         }
@@ -59,16 +59,16 @@ namespace AnonymousTokens.Server.Protocol
         /// Used by the token service. Creates a full transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
         /// The Chaum-Pedersen proof proves that the same secret key k is used to compute K = k*G and Q = k*P, without revealing k.
         /// </summary>
-        /// <param name="k">The private key.</param>
-        /// <param name="K">The public key.</param>
         /// <param name="ecParameters">Curve parameters</param>
+        /// <param name="k">The private key of the token scheme</param>
+        /// <param name="K">The public key of the token scheme</param>
         /// <param name="P">Point submitted by the initiator</param>
         /// <param name="Q">Point signed using the secret key</param>
         /// <returns></returns>
         private (BigInteger c, BigInteger z) CreateProof(
+            X9ECParameters ecParameters,
             BigInteger k,
             ECPoint K,
-            X9ECParameters ecParameters,
             ECPoint P,
             ECPoint Q)
         {

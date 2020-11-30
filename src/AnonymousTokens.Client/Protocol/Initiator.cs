@@ -71,15 +71,15 @@ namespace AnonymousTokens.Protocol
         /// <summary>
         /// Used by the initiator. It first verifies that the incoming token is well-formed, and then removes the previously applied mask.
         /// </summary>
-        /// <param name="K">The public key parameters for the token scheme</param>
         /// <param name="ecParameters">Curve parameters</param>
+        /// <param name="K">The public key parameters for the token scheme</param>
         /// <param name="P">Masked point initially submitted to the token service</param>
         /// <param name="Q">Signed masked point returned from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <param name="r">Masking of the initial point</param>
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
-        public ECPoint RandomiseToken(ECPublicKeyParameters K, X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
+        public ECPoint RandomiseToken(X9ECParameters ecParameters, ECPublicKeyParameters K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             ECCurve? curve = ecParameters.Curve;
 

@@ -53,7 +53,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_publicKey, _ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_ecParameters, _publicKey, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
             var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
@@ -76,7 +76,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_publicKey, _ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_ecParameters, _publicKey, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
             var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
@@ -206,7 +206,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKey, _publicKey.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(_publicKey, _ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_ecParameters, _publicKey, P, Q, proofC, proofZ, r);
 
             // Create a new point with invalid coordinates
             var invalidW = _ecParameters.Curve.CreatePoint(W.XCoord.ToBigInteger().Add(BigInteger.One), W.YCoord.ToBigInteger());
