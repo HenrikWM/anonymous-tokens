@@ -1,5 +1,6 @@
 
 using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
@@ -48,29 +49,29 @@ namespace AnonymousTokens.Protocol
         /// <summary>
         /// Used by the initiator. Verifies a transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
         /// </summary>
-        /// <param name="K">The public key for the token scheme</param>
+        /// <param name="K">The public key parameters for the token scheme</param>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="P">Point initially submitted by the initiator</param>
         /// <param name="Q">Point received from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <returns>Returns true if the proof is valid and otherwise returns false</returns>
-        public bool VerifyProof(ECPoint K, X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
+        public bool VerifyProof(ECPublicKeyParameters K, X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
         {
             // Compute X = z*G + c*K = r*G
-            ECPoint? X = ecParameters.G.Multiply(z).Add(K.Multiply(c));
+            ECPoint? X = ecParameters.G.Multiply(z).Add(K.Q.Multiply(c));
 
             // Compute Y = z*P + c*Q = r*P
             ECPoint? Y = P.Multiply(z).Add(Q.Multiply(c));
 
             // Returns true if the challenge from the proof equals the new challenge
-            return c.Equals(CPChallengeGenerator.CreateChallenge(ecParameters.G, P, K, Q, X, Y));
+            return c.Equals(CPChallengeGenerator.CreateChallenge(ecParameters.G, P, K.Q, Q, X, Y));
         }
 
         /// <summary>
         /// Used by the initiator. It first verifies that the incoming token is well-formed, and then removes the previously applied mask.
         /// </summary>
-        /// <param name="K">The public key for the token scheme</param>
+        /// <param name="K">The public key parameters for the token scheme</param>
         /// <param name="ecParameters">Curve parameters</param>
         /// <param name="P">Masked point initially submitted to the token service</param>
         /// <param name="Q">Signed masked point returned from the token service</param>
@@ -78,7 +79,7 @@ namespace AnonymousTokens.Protocol
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <param name="r">Masking of the initial point</param>
         /// <returns>A randomised signature W on the point chosen by the initiator</returns>
-        public ECPoint RandomiseToken(ECPoint K, X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
+        public ECPoint RandomiseToken(ECPublicKeyParameters K, X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z, BigInteger r)
         {
             ECCurve? curve = ecParameters.Curve;
 

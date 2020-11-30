@@ -42,7 +42,7 @@ namespace AnonymousTokensConsole
             var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiator.RandomiseToken(publicKey.Q, ecParameters, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(publicKey, ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
             var isVerified = await _tokenVerificationClient.VerifyTokenAsync(t, W);
