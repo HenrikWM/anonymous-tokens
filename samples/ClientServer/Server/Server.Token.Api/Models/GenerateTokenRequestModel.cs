@@ -1,4 +1,4 @@
-﻿namespace Server.TokenGeneration.Api.Models
+namespace Server.Token.Api.Models
 {
 
     public class GenerateTokenRequestModel

@@ -1,7 +1,7 @@
-﻿using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace AnonymousTokensConsole.ApiClients.TokenGeneration.Models
+namespace AnonymousTokensConsole.ApiClients.TokenApi.Models
 {
     public class GenerateTokenRequestModel
     {
