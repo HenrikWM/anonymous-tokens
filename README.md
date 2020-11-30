@@ -100,12 +100,17 @@ Your client should now be able to perform the protocol flow.
   - `dotnet run --project .\samples\ClientServer\Client.Console\Client.Console.csproj`
   - `dotnet run --project .\samples\ClientServer\Server.Token.Api\Server.Token.Api.csproj`
 
-## Roadmap
+### Build and run benchmarks
 
-- Test-coverage
-- Performance-pass
-- Investigate usage of `SecureRandom` - re-use vs instantiation per use
-- Publish NuGet-package
+After running `build.ps1` navigate to the benchmark project:
+
+`cd test\AnonymousTokens.Benchmark`
+
+Run all benchmarks:
+
+`dotnet run -c Release --filter *`
+
+When complete you will see the output generated in a new `BenchmarkDotNet.Artifacts\results` folder.
 
 ## Sources
 
