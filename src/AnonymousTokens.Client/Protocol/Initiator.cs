@@ -49,14 +49,14 @@ namespace AnonymousTokens.Protocol
         /// <summary>
         /// Used by the initiator. Verifies a transcript of a Chaum-Pedersen protocol instance, using the strong Fiat-Shamir transform.
         /// </summary>
-        /// <param name="K">The public key parameters for the token scheme</param>
         /// <param name="ecParameters">Curve parameters</param>
+        /// <param name="K">The public key parameters for the token scheme</param>
         /// <param name="P">Point initially submitted by the initiator</param>
         /// <param name="Q">Point received from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
         /// <param name="z">Response from the Chaum-Pedersen proof</param>
         /// <returns>Returns true if the proof is valid and otherwise returns false</returns>
-        public bool VerifyProof(ECPublicKeyParameters K, X9ECParameters ecParameters, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
+        public bool VerifyProof(X9ECParameters ecParameters, ECPublicKeyParameters K, ECPoint P, ECPoint Q, BigInteger c, BigInteger z)
         {
             // Compute X = z*G + c*K = r*G
             ECPoint? X = ecParameters.G.Multiply(z).Add(K.Q.Multiply(c));
@@ -92,7 +92,7 @@ namespace AnonymousTokens.Protocol
                 throw new AnonymousTokensException("Q is not a valid point on the curve");
 
             // Verify the proof (c,z).
-            if (!VerifyProof(K, ecParameters, P, Q, c, z))
+            if (!VerifyProof(ecParameters, K, P, Q, c, z))
                 throw new AnonymousTokensException("Chaum-Pedersen proof is invalid");
 
             // Removing the initial mask r. W = (1/r)*Q = k*T.

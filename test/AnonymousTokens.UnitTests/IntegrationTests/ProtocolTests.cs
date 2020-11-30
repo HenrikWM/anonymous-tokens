@@ -106,7 +106,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_wrongPrivateKey, _publicKey.Q, _ecParameters, P);
 
             // Verify the proof
-            var isValid = _initiator.VerifyProof(_publicKey, _ecParameters, P, Q, proofC, proofZ);
+            var isValid = _initiator.VerifyProof(_ecParameters, _publicKey, P, Q, proofC, proofZ);
             Assert.False(isValid, "Keys were incorrect and the proof did not get verified");
         }
 
@@ -126,7 +126,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var changedQ = Q.Twice();
 
             // Try randomising the token
-            var isValid = _initiator.VerifyProof(_publicKey, _ecParameters, P, changedQ, proofC, proofZ);
+            var isValid = _initiator.VerifyProof(_ecParameters, _publicKey, P, changedQ, proofC, proofZ);
             Assert.False(isValid, "The token was malformed and the proof did not get verified");
         }
 
@@ -146,7 +146,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var changedC = proofC.Add(BigInteger.One);
 
             // Try randomising the token
-            var isValid = _initiator.VerifyProof(_publicKey, _ecParameters, P, Q, changedC, proofZ);
+            var isValid = _initiator.VerifyProof(_ecParameters, _publicKey, P, Q, changedC, proofZ);
             Assert.False(isValid, "The challenge was changed and the proof did not get verified");
         }
 
@@ -166,7 +166,7 @@ namespace AnonymousTokens.UnitTests.IntegrationTests
             var changedZ = proofZ.Add(BigInteger.One);
 
             // Try randomising the token
-            var isValid = _initiator.VerifyProof(_publicKey, _ecParameters, P, Q, proofC, changedZ);
+            var isValid = _initiator.VerifyProof(_ecParameters, _publicKey, P, Q, proofC, changedZ);
             Assert.False(isValid, "The response was changed and the proof did not get verified");
         }
 
