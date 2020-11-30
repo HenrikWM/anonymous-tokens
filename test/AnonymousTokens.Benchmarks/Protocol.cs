@@ -69,7 +69,7 @@ namespace AnonymousTokens.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public async void RunProtocolEndToEnd()
+        public void RunProtocolEndToEnd()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiator.Initiate(_ecParameters.Curve);
@@ -84,7 +84,7 @@ namespace AnonymousTokens.Benchmarks
             var W = _initiator.RandomiseToken(_publicKey.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = await _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W);
+            var isVerified = _tokenVerifier.VerifyTokenAsync(_privateKey, _ecParameters.Curve, t, W).GetAwaiter().GetResult();
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");
@@ -92,7 +92,7 @@ namespace AnonymousTokens.Benchmarks
         }
 
         [Benchmark]
-        public async void RunProtocolEndToEnd_WithGeneratedKeysAsync()
+        public void RunProtocolEndToEnd_WithGeneratedKeysAsync()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
             var init = _initiatorWithGeneratedKey.Initiate(_ecParameters.Curve);
@@ -107,7 +107,7 @@ namespace AnonymousTokens.Benchmarks
             var W = _initiatorWithGeneratedKey.RandomiseToken(_publicKeyGenerated.Q, _ecParameters, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = await _tokenVerifierWithGeneratedKey.VerifyTokenAsync(_privateKeyGenerated, _ecParameters.Curve, t, W);
+            var isVerified = _tokenVerifierWithGeneratedKey.VerifyTokenAsync(_privateKeyGenerated, _ecParameters.Curve, t, W).GetAwaiter().GetResult();
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");
