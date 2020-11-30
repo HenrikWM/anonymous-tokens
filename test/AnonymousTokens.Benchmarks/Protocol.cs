@@ -38,6 +38,10 @@ namespace AnonymousTokens.Benchmarks
             // Import parameters for the elliptic curve prime256v1
             _ecParameters = CustomNamedCurves.GetByOid(X9ObjectIdentifiers.Prime256v1);
 
+            _initiator = new Initiator();
+            _tokenGenerator = new TokenGenerator();
+            _tokenVerifier = new TokenVerifier(new InMemorySeedStore());
+
             SetupWithInMemoryKeyStores();
 
             SetupWithGeneratedKeys();
@@ -50,10 +54,6 @@ namespace AnonymousTokens.Benchmarks
 
             var privateKeyStore = new InMemoryPrivateKeyStore();
             _privateKey = privateKeyStore.GetAsync().GetAwaiter().GetResult();
-
-            _initiator = new Initiator();
-            _tokenGenerator = new TokenGenerator();
-            _tokenVerifier = new TokenVerifier(new InMemorySeedStore());
         }
 
         private void SetupWithGeneratedKeys()
@@ -62,10 +62,6 @@ namespace AnonymousTokens.Benchmarks
 
             _privateKeyGenerated = (keyPair.Private as ECPrivateKeyParameters).D;
             _publicKeyGenerated = keyPair.Public as ECPublicKeyParameters;
-
-            _initiatorWithGeneratedKey = new Initiator();
-            _tokenGeneratorWithGeneratedKeys = new TokenGenerator();
-            _tokenVerifierWithGeneratedKey = new TokenVerifier(new InMemorySeedStore());
         }
 
         [Benchmark(Baseline = true)]
