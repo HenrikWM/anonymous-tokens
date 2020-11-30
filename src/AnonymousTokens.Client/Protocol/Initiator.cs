@@ -7,7 +7,27 @@ using Org.BouncyCastle.Security;
 
 namespace AnonymousTokens.Protocol
 {
-    public class Initiator
+    public interface IInitiator
+    {
+        public (byte[] t, BigInteger r, ECPoint P) Initiate(ECCurve curve);
+        public bool VerifyProof(
+            X9ECParameters ecParameters,
+            ECPublicKeyParameters K,
+            ECPoint P,
+            ECPoint Q,
+            BigInteger c,
+            BigInteger z);
+        public ECPoint RandomiseToken(
+            X9ECParameters ecParameters,
+            ECPublicKeyParameters K,
+            ECPoint P,
+            ECPoint Q,
+            BigInteger c,
+            BigInteger z,
+            BigInteger r);
+    }
+
+    public class Initiator : IInitiator
     {
         private readonly SecureRandom _random;
 
