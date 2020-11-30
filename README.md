@@ -36,12 +36,17 @@ This Proof-of-Concept contains:
   - `dotnet run --project .\samples\ClientServer\Server\Server.TokenGeneration.Api\Server.TokenGeneration.Api.csproj`
   - `dotnet run --project .\samples\ClientServer\Server\Server.TokenVerification.Api\Server.TokenVerification.Api.csproj`
 
-## Roadmap
+### Build and run benchmarks
 
-- Test-coverage
-- Performance-pass
-- Investigate usage of `SecureRandom` - re-use vs instantiation per use
-- Publish NuGet-package
+After running `build.ps1` navigate to the benchmark project:
+
+`cd test\AnonymousTokens.Benchmark`
+
+Run all benchmarks:
+
+`dotnet run -c Release --filter *`
+
+When complete you will see the output generated in a new `BenchmarkDotNet.Artifacts\results` folder.
 
 ## Sources
 

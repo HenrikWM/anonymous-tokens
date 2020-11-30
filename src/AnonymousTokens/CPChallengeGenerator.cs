@@ -26,16 +26,16 @@ namespace AnonymousTokens
         public static BigInteger CreateChallenge(ECPoint G, ECPoint P, ECPoint K, ECPoint Q, ECPoint X, ECPoint Y)
         {
             // Encode the ECPoint inputs
-            var GEncoded = G.GetEncoded();
-            var PEncoded = P.GetEncoded();
-            var KEncoded = K.GetEncoded();
-            var QEncoded = Q.GetEncoded();
-            var XEncoded = X.GetEncoded();
-            var YEncoded = Y.GetEncoded();
+            byte[]? GEncoded = G.GetEncoded();
+            byte[]? PEncoded = P.GetEncoded();
+            byte[]? KEncoded = K.GetEncoded();
+            byte[]? QEncoded = Q.GetEncoded();
+            byte[]? XEncoded = X.GetEncoded();
+            byte[]? YEncoded = Y.GetEncoded();
 
             // Domain separation: make sure hash is independent of other systems
-            var domain = "smittestopptoken";
-            var domainEncoded = Encoding.ASCII.GetBytes(domain);
+            string? domain = "AnonymousTokens";
+            byte[]? domainEncoded = Encoding.ASCII.GetBytes(domain);
 
             // Using concat() is best for performance: https://stackoverflow.com/a/415396
             IEnumerable<byte> points = domainEncoded
@@ -46,8 +46,8 @@ namespace AnonymousTokens
                 .Concat(XEncoded)
                 .Concat(YEncoded);
 
-            var sha256 = SHA256.Create();
-            var hashAsInt = new BigInteger(sha256.ComputeHash(points.ToArray()));
+            SHA256? sha256 = SHA256.Create();
+            BigInteger? hashAsInt = new BigInteger(sha256.ComputeHash(points.ToArray()));
 
             return hashAsInt.Mod(G.Curve.Order);
         }

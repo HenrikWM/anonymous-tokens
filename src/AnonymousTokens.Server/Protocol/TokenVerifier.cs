@@ -50,13 +50,18 @@ namespace AnonymousTokens.Server.Protocol
             if (await _seedStore.ExistsAsync(t))
                 return false;
 
+            // Check that W is a valid point on the currect curve
+            if (ECPointVerifier.PointIsValid(W, curve) == false)
+                throw new AnonymousTokensException("W is not a valid point on the curve");
+
             await _seedStore.SaveAsync(t);
 
-            var T = ECCurveHash.HashToWeierstrassCurve(curve, t);
+            ECPoint? T = ECCurveHash.HashToWeierstrassCurve(curve, t);
             if (T == null)
                 return false;
 
-            var V = T.Multiply(k);
+            ECPoint? V = T.Multiply(k);
+
             return V.Equals(W);
         }
     }
