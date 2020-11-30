@@ -33,7 +33,7 @@ namespace Server.TokenVerification.Api.Controllers
 
         [Route("verify")]
         [HttpPost]
-        public async Task<bool> VerifyAsync(VerifyTokenRequestModel model)
+        public async Task<bool> Verify(VerifyTokenRequestModel model)
         {
             var k = await _privateKeyStore.GetAsync();
             var t = Hex.Decode(model.tAsHex);

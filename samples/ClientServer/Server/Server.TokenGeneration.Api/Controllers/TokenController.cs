@@ -35,7 +35,7 @@ namespace Server.TokenGeneration.Api.Controllers
 
         [Route("generate")]
         [HttpPost]
-        public async Task<GenerateTokenResponseModel> GenerateAsync(GenerateTokenRequestModel model)
+        public async Task<GenerateTokenResponseModel> Generate(GenerateTokenRequestModel model)
         {
             var k = await _privateKeyStore.GetAsync();
             var K = await _publicKeyStore.GetAsync();
