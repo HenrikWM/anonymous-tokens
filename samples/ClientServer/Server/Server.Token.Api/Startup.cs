@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Server.Backend
+namespace Server.Token.Api
 {
     public class Startup
     {
@@ -23,6 +23,7 @@ namespace Server.Backend
             services.AddSingleton<IPrivateKeyStore, InMemoryPrivateKeyStore>();
             services.AddSingleton<IPublicKeyStore, InMemoryPublicKeyStore>();
             services.AddSingleton<ITokenGenerator, TokenGenerator>();
+            services.AddSingleton<ITokenVerifier, TokenVerifier>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

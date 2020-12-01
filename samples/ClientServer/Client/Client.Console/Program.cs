@@ -2,9 +2,7 @@
 using AnonymousTokens.Client.Protocol;
 using AnonymousTokens.Services.InMemory;
 
-using AnonymousTokensConsole.ApiClients.TokenGeneration;
-
-using Client.Console.ApiClients.TokenVerification;
+using AnonymousTokensConsole.ApiClients.TokenApi;
 
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;
@@ -19,8 +17,7 @@ namespace AnonymousTokensConsole
     {
         private static Initiator _initiator;
 
-        private static readonly TokenGenerationApiClient _tokenGenerationClient = new TokenGenerationApiClient();
-        private static readonly TokenVerificationApiClient _tokenVerificationClient = new TokenVerificationApiClient();
+        private static readonly TokenApiClient _tokenApiClient = new TokenApiClient();
 
         static async Task Main(string[] args)
         {
@@ -39,13 +36,13 @@ namespace AnonymousTokensConsole
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = await _tokenGenerationClient.GenerateTokenAsync(ecParameters.Curve, P);
+            var (Q, proofC, proofZ) = await _tokenApiClient.GenerateTokenAsync(ecParameters.Curve, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
             var W = _initiator.RandomiseToken(ecParameters, publicKey, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = await _tokenVerificationClient.VerifyTokenAsync(t, W);
+            var isVerified = await _tokenApiClient.VerifyTokenAsync(t, W);
             if (isVerified)
             {
                 Console.WriteLine("Token is valid.");

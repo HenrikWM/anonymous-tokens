@@ -1,4 +1,4 @@
-﻿namespace Server.TokenVerification.Api.Models
+namespace Server.Token.Api.Models
 {
     public class VerifyTokenRequestModel
     {

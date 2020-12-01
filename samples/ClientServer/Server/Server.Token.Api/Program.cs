@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Server.Backend
+namespace Server.Token.Api
 {
     public class Program
     {

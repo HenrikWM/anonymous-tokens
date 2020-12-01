@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace AnonymousTokensConsole.ApiClients.TokenGeneration.Models
+namespace AnonymousTokensConsole.ApiClients.TokenApi.Models
 {
     public class GenerateTokenResponseModel
     {

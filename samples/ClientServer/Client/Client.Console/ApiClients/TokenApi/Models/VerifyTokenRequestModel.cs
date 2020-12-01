@@ -1,7 +1,7 @@
-﻿using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace Client.Console.ApiClients.TokenVerification.Models
+namespace Client.Console.ApiClients.TokenApi.Models
 {
     public class VerifyTokenRequestModel
     {

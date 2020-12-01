@@ -1,8 +1,8 @@
-﻿using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace Server.TokenGeneration.Api.Models
+namespace Server.Token.Api.Models
 {
     public class GenerateTokenResponseModel
     {
