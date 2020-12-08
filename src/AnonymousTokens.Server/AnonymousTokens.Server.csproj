@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
   </ItemGroup>
 
@@ -20,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnonymousTokens\AnonymousTokens.csproj" />
+    <ProjectReference Include="..\AnonymousTokens.Core\AnonymousTokens.Core.csproj" />
   </ItemGroup>
 
 </Project>

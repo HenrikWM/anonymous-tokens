@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Server", "src\AnonymousTokens.Server\AnonymousTokens.Server.csproj", "{EF827382-7F6E-4230-A917-9D11415ECAD6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens", "src\AnonymousTokens\AnonymousTokens.csproj", "{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnonymousTokens.Core", "src\AnonymousTokens.Core\AnonymousTokens.Core.csproj", "{EAD6EEA6-8866-4D23-BCE0-891AEE53BE98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnonymousTokens.Benchmarks", "test\AnonymousTokens.Benchmarks\AnonymousTokens.Benchmarks.csproj", "{FE1684A8-5257-48B5-A067-836D75831D15}"
 EndProject

@@ -16,6 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnonymousTokens\AnonymousTokens.csproj" />
+    <ProjectReference Include="..\AnonymousTokens.Core\AnonymousTokens.Core.csproj" />
   </ItemGroup>
 </Project>

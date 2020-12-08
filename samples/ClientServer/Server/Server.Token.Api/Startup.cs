@@ -1,7 +1,7 @@
 
+using AnonymousTokens.Core.Services;
+using AnonymousTokens.Core.Services.InMemory;
 using AnonymousTokens.Server.Protocol;
-using AnonymousTokens.Services;
-using AnonymousTokens.Services.InMemory;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

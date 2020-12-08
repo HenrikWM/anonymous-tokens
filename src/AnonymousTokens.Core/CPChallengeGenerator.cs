@@ -8,7 +8,7 @@ using System.Text;
 
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
-namespace AnonymousTokens
+namespace AnonymousTokens.Core
 {
     public static class CPChallengeGenerator
     {

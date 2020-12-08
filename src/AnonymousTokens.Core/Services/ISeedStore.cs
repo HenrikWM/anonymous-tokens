@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace AnonymousTokens.Services
+namespace AnonymousTokens.Core.Services
 {
     public interface ISeedStore
     {

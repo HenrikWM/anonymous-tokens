@@ -1,6 +1,7 @@
 
+using AnonymousTokens.Core;
+using AnonymousTokens.Core.Services;
 using AnonymousTokens.Server.Protocol;
-using AnonymousTokens.Services;
 
 using Moq;
 
