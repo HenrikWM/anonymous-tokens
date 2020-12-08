@@ -17,15 +17,9 @@ namespace AnonymousTokensConsole.ApiClients.TokenApi
 {
     public class TokenApiClient
     {
-        private static readonly HttpClient _client = new HttpClient();
+        private HttpClient _client;
 
         private const string TokenApiUrl = "https://localhost:5011";
-
-        public TokenApiClient()
-        {
-            //_client.BaseAddress = new Uri(TokenApiUrl);
-            _client.DefaultRequestHeaders.Add("Accept", "application/json");
-        }
 
         public async Task<(ECPoint Q, BigInteger proofC, BigInteger proofZ)> GenerateTokenAsync(ECCurve curve, ECPoint P)
         {
@@ -38,8 +32,10 @@ namespace AnonymousTokensConsole.ApiClients.TokenApi
             request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
             // Call Smittestopp2 Verification API
+            _client = new HttpClient();
+            _client.DefaultRequestHeaders.Add("Accept", "application/json");
             _client.BaseAddress = new Uri("https://localhost:5001/");
-            _client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRBOTg5RTI1QzYxRTBFRUYxNTU1MzA2MUJFREIwNUFGIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDc0Mjg1MjYsImV4cCI6MTYwNzQzMjEyNiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEvcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoidGVzdC1zcGEtY2xpZW50Iiwic3ViIjoiZjQ2MjAyODMtZWI5Yy00NjU4LWE2YTUtMTRkZGZhODRjMTFjIiwiYXV0aF90aW1lIjoxNjA3NDI4NTIzLCJpZHAiOiJpZHBvcnRlbiIsImNvdmlkMTlfc3RhdHVzIjoicG9zaXRpdiIsImNvdmlkMTlfYmxva2VyZXQiOiJmYWxzZSIsImNvdmlkMTlfYW5vbnltb3VzX3Rva2VuIjoiYXZhaWxhYmxlIiwiY292aWQxOV9zbWl0dGVfc3RhcnQiOiIyMDIwLTExLTMwIiwianRpIjoiRTkwMjg4MTAzMjg1M0Y4OTVENENCNzNFMEY2NjFBMTciLCJzaWQiOiIzRkQxMDk4NTg0RTQyMzExNTVGRDc5NUVBQkM0N0I3RiIsImlhdCI6MTYwNzQyODUyNiwic2NvcGUiOlsib3BlbmlkIiwic21pdHRlc3RvcCJdLCJhbXIiOlsiZXh0ZXJuYWwiXX0.nX-zwIHNo7zgh_SVnjTfZq57w-6WS8bQfdBS4z4z60NBGntIRUf8OnpSTsVJCtRCy9WgI_9kir8ZygBzktYAJYFgRJNmzN6Yl93nZI8y80t_tmtEGpBq8jQbu4dkRzUPCNDuNwLh4LUjXPoEwCTEZodEYBp4ogsBG0PS_j7yDLWlodW05j2-Sns-9iRiNuoF_WLxKS0RHmIChR3MaLKA4PXZunC4RJTi3EinbUy3nMhhvAtbo3iOLpRlBVXqChzofjr8xbt1IqbF6sXzQaeUJObHU898knEONSQSmm4Xtr8-2O_8FrM6ewpPBNP4kYL__LhaFWsyFTSdBzKeEUpcUw");
+            _client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkRBOTg5RTI1QzYxRTBFRUYxNTU1MzA2MUJFREIwNUFGIiwidHlwIjoiYXQrand0In0.eyJuYmYiOjE2MDc0Mjg1MjYsImV4cCI6MTYwNzQzMjEyNiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEvcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoidGVzdC1zcGEtY2xpZW50Iiwic3ViIjoiZjQ2MjAyODMtZWI5Yy00NjU4LWE2YTUtMTRkZGZhODRjMTFjIiwiYXV0aF90aW1lIjoxNjA3NDI4NTIzLCJpZHAiOiJpZHBvcnRlbiIsImNvdmlkMTlfc3RhdHVzIjoicG9zaXRpdiIsImNvdmlkMTlfYmxva2VyZXQiOiJmYWxzZSIsImNvdmlkMTlfYW5vbnltb3VzX3Rva2VuIjoiYXZhaWxhYmxlIiwiY292aWQxOV9zbWl0dGVfc3RhcnQiOiIyMDIwLTExLTMwIiwianRpIjoiRTkwMjg4MTAzMjg1M0Y4OTVENENCNzNFMEY2NjFBMTciLCJzaWQiOiIzRkQxMDk4NTg0RTQyMzExNTVGRDc5NUVBQkM0N0I3RiIsImlhdCI6MTYwNzQyODUyNiwic2NvcGUiOlsib3BlbmlkIiwic21pdHRlc3RvcCJdLCJhbXIiOlsiZXh0ZXJuYWwiXX0.nX-zwIHNo7zgh_SVnjTfZq57w-6WS8bQfdBS4z4z60NBGntIRUf8OnpSTsVJCtRCy9WgI_9kir8ZygBzktYAJYFgRJNmzN6Yl93nZI8y80t_tmtEGpBq8jQbu4dkRzUPCNDuNwLh4LUjXPoEwCTEZodEYBp4ogsBG0PS_j7yDLWlodW05j2-Sns-9iRiNuoF_WLxKS0RHmIChR3MaLKA4PXZunC4RJTi3EinbUy3nMhhvAtbo3iOLpRlBVXqChzofjr8xbt1IqbF6sXzQaeUJObHU898knEONSQSmm4Xtr8-2O_8FrM6ewpPBNP4kYL__LhaFWsyFTSdBzKeEUpcUw");
 
             var result = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             if (result.IsSuccessStatusCode)
@@ -67,6 +63,8 @@ namespace AnonymousTokensConsole.ApiClients.TokenApi
 
             request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
+            _client = new HttpClient();
+            _client.DefaultRequestHeaders.Add("Accept", "application/json");
             _client.BaseAddress = new Uri("https://localhost:5011/");
 
             var result = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
