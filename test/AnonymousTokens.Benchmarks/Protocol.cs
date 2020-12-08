@@ -1,6 +1,6 @@
 using AnonymousTokens.Client.Protocol;
+using AnonymousTokens.Core.Services.InMemory;
 using AnonymousTokens.Server.Protocol;
-using AnonymousTokens.Services.InMemory;
 
 using BenchmarkDotNet.Attributes;
 

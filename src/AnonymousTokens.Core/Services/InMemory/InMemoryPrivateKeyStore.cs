@@ -4,7 +4,7 @@ using Org.BouncyCastle.Math;
 
 using System.Threading.Tasks;
 
-namespace AnonymousTokens.Services.InMemory
+namespace AnonymousTokens.Core.Services.InMemory
 {
     public class InMemoryPrivateKeyStore : IPrivateKeyStore
     {

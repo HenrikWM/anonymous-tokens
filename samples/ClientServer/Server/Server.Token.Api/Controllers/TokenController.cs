@@ -1,5 +1,5 @@
+using AnonymousTokens.Core.Services;
 using AnonymousTokens.Server.Protocol;
-using AnonymousTokens.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +23,7 @@ namespace Server.Token.Api.Controllers
         private readonly ITokenVerifier _tokenVerifier;
 
         private readonly X9ECParameters _ecParameters;
-        
+
         public TokenController(
             IPrivateKeyStore privateKeyStore,
             IPublicKeyStore publicKeyStore,
