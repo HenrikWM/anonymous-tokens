@@ -115,3 +115,18 @@ When complete you will see the output generated in a new `BenchmarkDotNet.Artifa
 ## Sources
 
 - [Elliptical curve cryptography with Bouncy Castle](https://www.codeproject.com/Tips/1150485/Csharp-Elliptical-Curve-Cryptography-with-Bouncy-C)
+
+### Common abbreviations in Elliptic Curve crypto
+
+```
+k privateKey
+K publicKey
+t tokenSeed
+r tokenMask
+P maskedPoint
+Q signedPoint
+c proofChallenge
+z proofResponse
+W submittedPoint
+```
+
