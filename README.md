@@ -116,7 +116,9 @@ When complete you will see the output generated in a new `BenchmarkDotNet.Artifa
 
 - [Elliptical curve cryptography with Bouncy Castle](https://www.codeproject.com/Tips/1150485/Csharp-Elliptical-Curve-Cryptography-with-Bouncy-C)
 
-### Common abbreviations in Elliptic Curve crypto
+### Suggested descriptive variable names
+
+This code is naming variables according to the mathematics in the original crypographic work. The list below provides some programmer-friendly suggestions to what you could call these variables in your own code.
 
 ```
 k privateKey
