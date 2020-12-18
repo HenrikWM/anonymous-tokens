@@ -1,6 +1,7 @@
 using AnonymousTokens.Client.Protocol;
+using AnonymousTokens.Core;
+using AnonymousTokens.Core.Services.InMemory;
 using AnonymousTokens.Server.Protocol;
-using AnonymousTokens.Services.InMemory;
 
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.EC;

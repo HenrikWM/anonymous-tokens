@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using ECCurve = Org.BouncyCastle.Math.EC.ECCurve;
 using ECPoint = Org.BouncyCastle.Math.EC.ECPoint;
 
-namespace AnonymousTokens
+namespace AnonymousTokens.Core
 {
     public static class ECCurveHash
     {

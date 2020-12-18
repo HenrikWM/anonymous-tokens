@@ -1,6 +1,6 @@
 using System;
 
-namespace AnonymousTokens
+namespace AnonymousTokens.Core
 {
     public class AnonymousTokensException
         : Exception

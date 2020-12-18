@@ -4,7 +4,7 @@ using Org.BouncyCastle.Utilities.Encoders;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AnonymousTokens.Services.InMemory
+namespace AnonymousTokens.Core.Services.InMemory
 {
     public class InMemorySeedStore : ISeedStore
     {
