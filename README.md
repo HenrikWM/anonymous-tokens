@@ -129,6 +129,6 @@ P maskedPoint
 Q signedPoint
 c proofChallenge
 z proofResponse
-W submittedPoint
+W tokenPoint
 ```
 
