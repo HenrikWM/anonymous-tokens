@@ -100,7 +100,7 @@ namespace AnonymousTokens.Benchmarks
             var (Q, proofC, proofZ) = _tokenGeneratorWithGeneratedKeys.GenerateToken(_privateKeyGenerated, _publicKeyGenerated.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiatorWithGeneratedKey.RandomiseToken(_ecParameters, _publicKeyGenerated.Q, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_ecParameters, _publicKeyGenerated.Q, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
             var isVerified = _tokenVerifierWithGeneratedKey.VerifyTokenAsync(_privateKeyGenerated, _ecParameters.Curve, t, W).GetAwaiter().GetResult();
