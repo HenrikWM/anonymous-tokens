@@ -1,0 +1,57 @@
+name: Create release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+env:
+  DOTNET_VERSION: 3.1.301
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Job setup
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Build, test and pack/publish
+      - name: Build and Test
+        run: ./Build.ps1
+        shell: pwsh
+
+      # Upload artifacts
+      - name: Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts.zip
+          path: artifacts/**/*
+
+      # Create release with published artifact
+      - name: Create GitHub release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }} # Prerelease if vX.Y.Z-<any-suffix>
+
+      # NuGet publish
+      - name: Push to NuGet
+        env:
+          NUGET_URL: https://api.nuget.org/v3/index.json
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: ./Push.ps1
+        shell: pwsh
