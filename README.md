@@ -104,7 +104,7 @@ Your client should now be able to perform the protocol flow.
 
 After running `build.ps1` navigate to the benchmark project:
 
-`cd test\AnonymousTokens.Benchmark`
+`cd test\AnonymousTokens.Benchmarks`
 
 Run all benchmarks:
 
@@ -115,3 +115,20 @@ When complete you will see the output generated in a new `BenchmarkDotNet.Artifa
 ## Sources
 
 - [Elliptical curve cryptography with Bouncy Castle](https://www.codeproject.com/Tips/1150485/Csharp-Elliptical-Curve-Cryptography-with-Bouncy-C)
+
+### Suggested descriptive variable names
+
+This code is naming variables according to the mathematics in the original crypographic work. The list below provides some programmer-friendly suggestions to what you could call these variables in your own code.
+
+```
+k privateKey
+K publicKey
+t tokenSeed
+r tokenMask
+P maskedPoint
+Q signedPoint
+c proofChallenge
+z proofResponse
+W tokenPoint
+```
+

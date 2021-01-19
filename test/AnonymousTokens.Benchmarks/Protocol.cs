@@ -25,10 +25,6 @@ namespace AnonymousTokens.Benchmarks
         private BigInteger _privateKey;
         private ECPublicKeyParameters _publicKey;
 
-        private Initiator _initiatorWithGeneratedKey;
-        private TokenGenerator _tokenGeneratorWithGeneratedKeys;
-        private TokenVerifier _tokenVerifierWithGeneratedKey;
-
         private BigInteger _privateKeyGenerated;
         private ECPublicKeyParameters _publicKeyGenerated;
 
@@ -91,19 +87,19 @@ namespace AnonymousTokens.Benchmarks
         public void RunProtocolEndToEnd_WithGeneratedKeysAsync()
         {
             // 1. Initiate communication with a masked point P = r*T = r*Hash(t)
-            var init = _initiatorWithGeneratedKey.Initiate(_ecParameters.Curve);
+            var init = _initiator.Initiate(_ecParameters.Curve);
             var t = init.t;
             var r = init.r;
             var P = init.P;
 
             // 2. Generate token Q = k*P and proof (c,z) of correctness
-            var (Q, proofC, proofZ) = _tokenGeneratorWithGeneratedKeys.GenerateToken(_privateKeyGenerated, _publicKeyGenerated.Q, _ecParameters, P);
+            var (Q, proofC, proofZ) = _tokenGenerator.GenerateToken(_privateKeyGenerated, _publicKeyGenerated.Q, _ecParameters, P);
 
             // 3. Randomise the token Q, by removing the mask r: W = (1/r)*Q = k*T. Also checks that proof (c,z) is correct.
-            var W = _initiatorWithGeneratedKey.RandomiseToken(_ecParameters, _publicKeyGenerated, P, Q, proofC, proofZ, r);
+            var W = _initiator.RandomiseToken(_ecParameters, _publicKeyGenerated, P, Q, proofC, proofZ, r);
 
             // 4. Verify that the token (t,W) is correct.
-            var isVerified = _tokenVerifierWithGeneratedKey.VerifyTokenAsync(_privateKeyGenerated, _ecParameters.Curve, t, W).GetAwaiter().GetResult();
+            var isVerified = _tokenVerifier.VerifyTokenAsync(_privateKeyGenerated, _ecParameters.Curve, t, W).GetAwaiter().GetResult();
             if (isVerified == false)
             {
                 throw new Exception("Token was expected to be valid");
