@@ -104,7 +104,7 @@ Your client should now be able to perform the protocol flow.
 
 After running `build.ps1` navigate to the benchmark project:
 
-`cd test\AnonymousTokens.Benchmark`
+`cd test\AnonymousTokens.Benchmarks`
 
 Run all benchmarks:
 
