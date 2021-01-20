@@ -94,7 +94,7 @@ namespace AnonymousTokens.Client.Protocol
         /// Used by the initiator. It first verifies that the incoming token is well-formed, and then removes the previously applied mask.
         /// </summary>
         /// <param name="ecParameters">Curve parameters</param>
-        /// <param name="K">The public key pointfor the token scheme</param>
+        /// <param name="K">The public key point for the token scheme</param>
         /// <param name="P">Masked point initially submitted to the token service</param>
         /// <param name="Q">Signed masked point returned from the token service</param>
         /// <param name="c">Claimed challenge from the Chaum-Pedersen proof</param>
